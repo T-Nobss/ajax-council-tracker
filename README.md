@@ -33,6 +33,8 @@ or any text editor.
 | `votes.csv` | one councillor's vote on one motion | `motion_id`, `councillor_id`, `vote` |
 | `expenses.csv` | one expense total for a councillor | `councillor_id`, `year`, `category`, `amount`, `source_url` |
 | `salaries.csv` | one year of Town of Ajax pay for a member of council | `councillor_id`, `year`, `salary`, `taxable_benefits`, `source_url` |
+| `budget.csv` | one department's operating budget for one year | `year`, `department`, `gross_expenditure`, `revenue`, `net_budget`, `source_url`, `page` |
+| `capital_projects.csv` | one capital project in its budget year | `year`, `project_name`, `department`, `cost`, `funding_source`, `source_url`, `page` |
 
 `salaries.csv` is filled in automatically by a script (see
 [Updating salaries](#updating-salaries-the-sunshine-list) below), so you
@@ -151,6 +153,34 @@ included.
 
 ---
 
+## Updating the budget
+
+The Town's budget books (PDFs) are saved in `sources/budgets/`. A script reads
+them and writes `budget.csv` and `capital_projects.csv`:
+
+```bash
+python3 scripts/extract_budget.py
+```
+
+- **`budget.csv`** has one row per department per year: what it spends
+  (`gross_expenditure`), what it brings in from fees, grants and recoveries
+  (`revenue`), and the difference paid for by property tax (`net_budget`).
+  Mayor and Council is its own row.
+- **`capital_projects.csv`** lists every capital project with money in that
+  year's budget (not the 10-year forecast), with its cost and how it's paid for.
+- **`page`** is the page in the PDF where the number comes from, so anyone can
+  check it.
+
+The script checks its numbers against each book's own totals and writes the
+results to `data/review/budget.md`. Read that file after every run.
+
+To add a new year: save the operating and capital PDFs into
+`sources/budgets/`, add their web addresses to the `OPERATING` and `CAPITAL`
+lists at the top of `scripts/extract_budget.py`, and run it again. If a new
+book is laid out differently, the checks in the review file will show it.
+
+---
+
 ## Updating the live site
 
 The site is hosted on Vercel and connected to this project's GitHub repository.
@@ -181,3 +211,6 @@ npm run build   # production build
   file (additions, changes, deletions). Needs Node 18+ and network
   access to www.ontario.ca. Behind an HTTP proxy, run it with
   `NODE_USE_ENV_PROXY=1`.
+- `scripts/extract_budget.py` needs Python 3 and `pdftotext` (poppler-utils).
+  It only reads local PDFs. `sources/` is excluded from Vercel uploads via
+  `.vercelignore`.

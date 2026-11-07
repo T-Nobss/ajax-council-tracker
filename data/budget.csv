@@ -1,0 +1,46 @@
+year,department,gross_expenditure,revenue,net_budget,source_url,page
+2023,Mayor & Council,668300,0,668300,https://ajax.ca/wp-content/uploads/2026/06/2023-Operating-Budget-Electronic-Version.pdf,15
+2023,Office of the CAO,4174900,298500,3876400,https://ajax.ca/wp-content/uploads/2026/06/2023-Operating-Budget-Electronic-Version.pdf,21
+2023,Finance,4806700,2510300,2296400,https://ajax.ca/wp-content/uploads/2026/06/2023-Operating-Budget-Electronic-Version.pdf,29
+2023,Non-Departmental,14141900,7959400,6182500,https://ajax.ca/wp-content/uploads/2026/06/2023-Operating-Budget-Electronic-Version.pdf,31
+2023,Legislative & Information Services,8985700,1972200,7013500,https://ajax.ca/wp-content/uploads/2026/06/2023-Operating-Budget-Electronic-Version.pdf,38
+2023,Fire & Emergency Services,21776100,1974400,19801700,https://ajax.ca/wp-content/uploads/2026/06/2023-Operating-Budget-Electronic-Version.pdf,43
+2023,Operations & Environmental Services,24750700,2007100,22743600,https://ajax.ca/wp-content/uploads/2026/06/2023-Operating-Budget-Electronic-Version.pdf,47-58
+2023,Recreation & Culture,21435300,8207100,13228200,https://ajax.ca/wp-content/uploads/2026/06/2023-Operating-Budget-Electronic-Version.pdf,65-71
+2023,Planning & Development Services,7571400,5042600,2528800,https://ajax.ca/wp-content/uploads/2026/06/2023-Operating-Budget-Electronic-Version.pdf,78
+2023,Library Services,7201400,494800,6706600,https://ajax.ca/wp-content/uploads/2026/06/2023-Operating-Budget-Electronic-Version.pdf,83
+2024,Mayor & Council,1009100,306600,702500,https://ajax.ca/wp-content/uploads/2026/06/2024-Operating-Budget-Amended.pdf,19
+2024,Office of the CAO,5366200,423000,4943200,https://ajax.ca/wp-content/uploads/2026/06/2024-Operating-Budget-Amended.pdf,25
+2024,Finance,5834200,2959600,2874600,https://ajax.ca/wp-content/uploads/2026/06/2024-Operating-Budget-Amended.pdf,32
+2024,Non-Departmental,18039300,10601600,7437700,https://ajax.ca/wp-content/uploads/2026/06/2024-Operating-Budget-Amended.pdf,34
+2024,Legislative & Information Services,11379600,2639000,8740600,https://ajax.ca/wp-content/uploads/2026/06/2024-Operating-Budget-Amended.pdf,40
+2024,Fire & Emergency Services,22766100,721000,22045100,https://ajax.ca/wp-content/uploads/2026/06/2024-Operating-Budget-Amended.pdf,45
+2024,Operations & Environmental Services,26076500,2658100,23418400,https://ajax.ca/wp-content/uploads/2026/06/2024-Operating-Budget-Amended.pdf,50-61
+2024,Recreation & Culture,24002800,8441700,15561100,https://ajax.ca/wp-content/uploads/2026/06/2024-Operating-Budget-Amended.pdf,70-77
+2024,Planning & Development Services,7807900,5591200,2216700,https://ajax.ca/wp-content/uploads/2026/06/2024-Operating-Budget-Amended.pdf,86
+2024,Stormwater Management,3311000,3311000,0,https://ajax.ca/wp-content/uploads/2026/06/2024-Operating-Budget-Amended.pdf,91
+2024,Library Services,7526800,579600,6947200,https://ajax.ca/wp-content/uploads/2026/06/2024-Operating-Budget-Amended.pdf,97
+2025,Mayor & Council,1039000,311500,727500,https://ajax.ca/wp-content/uploads/2026/06/2025-Operating_Budget_-BookletAmended_.pdf,21
+2025,Office of the CAO,3182900,383800,2799100,https://ajax.ca/wp-content/uploads/2026/06/2025-Operating_Budget_-BookletAmended_.pdf,26
+2025,Public & Strategic Affairs,2663100,2000,2661100,https://ajax.ca/wp-content/uploads/2026/06/2025-Operating_Budget_-BookletAmended_.pdf,32
+2025,Corporate Services,12883400,3232800,9650600,https://ajax.ca/wp-content/uploads/2026/06/2025-Operating_Budget_-BookletAmended_.pdf,39
+2025,Finance,6202600,3618100,2584500,https://ajax.ca/wp-content/uploads/2026/06/2025-Operating_Budget_-BookletAmended_.pdf,48
+2025,Non-Departmental,18294400,9804800,8489600,https://ajax.ca/wp-content/uploads/2026/06/2025-Operating_Budget_-BookletAmended_.pdf,50
+2025,Fire & Emergency Services,24043900,552700,23491200,https://ajax.ca/wp-content/uploads/2026/06/2025-Operating_Budget_-BookletAmended_.pdf,54
+2025,Operations & Environmental Services,28032200,2656600,25375600,https://ajax.ca/wp-content/uploads/2026/06/2025-Operating_Budget_-BookletAmended_.pdf,60-71
+2025,Recreation & Culture,25422800,9006700,16416100,https://ajax.ca/wp-content/uploads/2026/06/2025-Operating_Budget_-BookletAmended_.pdf,79-86
+2025,Planning & Development Services,8241700,6121100,2120600,https://ajax.ca/wp-content/uploads/2026/06/2025-Operating_Budget_-BookletAmended_.pdf,94
+2025,Stormwater Management,3393700,3393700,0,https://ajax.ca/wp-content/uploads/2026/06/2025-Operating_Budget_-BookletAmended_.pdf,98
+2025,Library Services,8038800,586400,7452400,https://ajax.ca/wp-content/uploads/2026/06/2025-Operating_Budget_-BookletAmended_.pdf,104
+2026,Mayor & Council,1154000,319200,834800,https://ajax.ca/wp-content/uploads/2026/05/2026-Operating-Budget-Booklet-Amended.pdf,44
+2026,Office of the CAO,611800,0,611800,https://ajax.ca/wp-content/uploads/2026/05/2026-Operating-Budget-Booklet-Amended.pdf,47
+2026,Public & Strategic Affairs,3965800,879500,3086300,https://ajax.ca/wp-content/uploads/2026/05/2026-Operating-Budget-Booklet-Amended.pdf,50
+2026,Finance,6653400,4733300,1920100,https://ajax.ca/wp-content/uploads/2026/05/2026-Operating-Budget-Booklet-Amended.pdf,53
+2026,Non-Departmental,15703200,6045500,9657700,https://ajax.ca/wp-content/uploads/2026/05/2026-Operating-Budget-Booklet-Amended.pdf,55
+2026,Corporate Services,16471800,3534900,12936900,https://ajax.ca/wp-content/uploads/2026/05/2026-Operating-Budget-Booklet-Amended.pdf,58
+2026,Fire & Emergency Services,25281100,556900,24724200,https://ajax.ca/wp-content/uploads/2026/05/2026-Operating-Budget-Booklet-Amended.pdf,62
+2026,Operations & Environmental Services,29660600,2847600,26813000,https://ajax.ca/wp-content/uploads/2026/05/2026-Operating-Budget-Booklet-Amended.pdf,66-77
+2026,Recreation & Culture,26942000,10126200,16815800,https://ajax.ca/wp-content/uploads/2026/05/2026-Operating-Budget-Booklet-Amended.pdf,80-86
+2026,Planning & Development Services,8442300,6134600,2307700,https://ajax.ca/wp-content/uploads/2026/05/2026-Operating-Budget-Booklet-Amended.pdf,89
+2026,Stormwater Management,3671300,3671300,0,https://ajax.ca/wp-content/uploads/2026/05/2026-Operating-Budget-Booklet-Amended.pdf,93
+2026,Library Services,8643000,578900,8064000,https://ajax.ca/wp-content/uploads/2026/05/2026-Operating-Budget-Booklet-Amended.pdf,96
