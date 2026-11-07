@@ -6,3 +6,6 @@ out/
 *.log
 __pycache__/
 *.pyc
+
+# Temporary agenda downloads made by scripts/fetch_meetings.py
+sources/expenses/.agenda-*
