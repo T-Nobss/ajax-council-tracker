@@ -32,6 +32,12 @@ or any text editor.
 | `motions.csv` | a motion voted on at a meeting | `id`, `meeting_id`, `item`, `text`, `mover`, `seconder`, `result`, `recorded_vote` |
 | `votes.csv` | one councillor's vote on one motion | `motion_id`, `councillor_id`, `vote` |
 | `expenses.csv` | one expense total for a councillor | `councillor_id`, `year`, `category`, `amount`, `source_url` |
+| `salaries.csv` | one year of Town of Ajax pay for a member of council | `councillor_id`, `year`, `salary`, `taxable_benefits`, `source_url` |
+
+`salaries.csv` is filled in automatically by a script (see
+[Updating salaries](#updating-salaries-the-sunshine-list) below), so you
+normally don't edit it by hand. The `review` folder inside `data` holds notes
+the scripts leave for you to check. The website doesn't display them.
 
 ### How the files connect: IDs
 
@@ -107,6 +113,36 @@ jane-smith,2024,Mileage,1250.40,https://example.com/expenses-2024.pdf
 
 ---
 
+## Updating salaries (the Sunshine List)
+
+Ontario publishes the pay of every public sector employee who earned
+**$100,000 or more**. This is the "Sunshine List". The list for a year comes out
+the following spring. For example, 2025 pay was published in March 2026.
+
+A script downloads the list, picks out the Town of Ajax's Mayor and
+Councillors, matches them to `councillors.csv`, and rewrites `salaries.csv`.
+Ask a developer (or Claude) to run it each spring once the new year is out:
+
+```bash
+npm run salaries                # 2022–2025
+npm run salaries -- 2022 2026   # include a newer year once it's published
+```
+
+Afterwards, open `data/review/salaries.md`. It lists:
+
+- **names that didn't match**: someone on the list who isn't in
+  `councillors.csv`, or whose name is spelled differently. Fix
+  `councillors.csv` and run the script again.
+- **partial matches** to double-check (e.g. "Rob" matched to "Robert").
+- **years not published yet**.
+
+A member of council who doesn't appear for a year was paid **under $100,000**
+by the Town. It doesn't mean they were paid nothing. Regional Councillors and
+the Mayor are also paid separately by the Region of Durham, and that pay isn't
+included.
+
+---
+
 ## Updating the live site
 
 The site is hosted on Vercel and connected to this project's GitHub repository.
@@ -128,5 +164,10 @@ npm run build   # production build
 - Next.js (App Router), plain JavaScript and CSS, no other dependencies.
 - `lib/data.js` reads and parses the CSV files. Pages read the data on the
   server at build time, so the deployed site is static and fast.
-- Pages live in `app/`. Councillors, Votes, Expenses and Budget are
-  placeholders for now.
+- Pages live in `app/`. Votes, Expenses and Budget are placeholders for now.
+- `scripts/fetch-salaries.mjs` builds `data/salaries.csv` from the file index at
+  `https://www.ontario.ca/public-sector-salary-disclosure_artifacts/pssdfiles.json`
+  (2021 onward; older years are on data.ontario.ca). It applies each year's
+  addendum file (additions, changes, deletions). Needs Node 18+ and network
+  access to www.ontario.ca. Behind an HTTP proxy, run it with
+  `NODE_USE_ENV_PROXY=1`.

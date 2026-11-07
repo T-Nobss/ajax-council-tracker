@@ -5,11 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "salaries": "node scripts/fetch-salaries.mjs"
   },
   "dependencies": {
     "next": "16.4.5",
     "react": "19.3.1",
     "react-dom": "19.3.1"
-  }
+  },
+  "type": "module"
 }
