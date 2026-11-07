@@ -35,6 +35,7 @@ or any text editor.
 | `salaries.csv` | one year of Town of Ajax pay for a member of council | `councillor_id`, `year`, `salary`, `taxable_benefits`, `source_url` |
 | `budget.csv` | one department's operating budget for one year | `year`, `department`, `gross_expenditure`, `revenue`, `net_budget`, `source_url`, `page` |
 | `capital_projects.csv` | one capital project in its budget year | `year`, `project_name`, `department`, `cost`, `funding_source`, `source_url`, `page` |
+| `budget_reconciliation.csv` | why one year's department totals differ from the budget book's town-wide page (shown as a note on the Budget page) | `year`, `departments_spending`, `departments_revenue`, `town_spending`, `town_revenue`, `library_revenue`, `library_debt`, `other_costs`, `other_recoveries`, `town_page`, `library_page`, `source_url` |
 
 `salaries.csv` is filled in automatically by a script (see
 [Updating salaries](#updating-salaries-the-sunshine-list) below), so you
@@ -170,6 +171,8 @@ python3 scripts/extract_budget.py
   year's budget (not the 10-year forecast), with its cost and how it's paid for.
 - **`page`** is the page in the PDF where the number comes from, so anyone can
   check it.
+- **`budget_reconciliation.csv`** is also written by the script. It feeds the
+  note behind the "i" next to "Operating budget" on the website.
 
 The script checks its numbers against each book's own totals and writes the
 results to `data/review/budget.md`. Read that file after every run.
@@ -202,7 +205,7 @@ npm run build   # production build
 - Next.js (App Router), plain JavaScript and CSS, no other dependencies.
 - `lib/data.js` reads and parses the CSV files. Pages read the data on the
   server at build time, so the deployed site is static and fast.
-- Pages live in `app/`. Votes, Expenses and Budget are placeholders for now.
+- Pages live in `app/`. Votes and Expenses are placeholders for now.
 - `scripts/fetch-salaries.mjs` updates `data/salaries.csv` for the years given,
   keeping rows for other years. 2021 onward comes from the file index at
   `https://www.ontario.ca/public-sector-salary-disclosure_artifacts/pssdfiles.json`,

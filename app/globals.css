@@ -378,3 +378,135 @@ h2 {
     font-size: 0.875rem;
   }
 }
+
+/* Budget page */
+.m-short {
+  display: none;
+}
+@media (max-width: 560px) {
+  .m-full {
+    display: none;
+  }
+  .m-short {
+    display: inline;
+  }
+}
+.budget-table tbody th,
+.budget-table tfoot th {
+  white-space: normal;
+  font-weight: 500;
+  min-width: 9em;
+}
+.budget-table tfoot th,
+.budget-table tfoot td {
+  font-weight: 700;
+  border-top: 2px solid var(--border);
+  border-bottom: 0;
+  background: var(--surface);
+}
+.row-link {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 3px;
+}
+.row-link:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+.table-hint {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.info-panel ol {
+  margin: 0 0 10px;
+  padding-left: 20px;
+}
+.info-panel li {
+  margin-bottom: 6px;
+}
+.capital-total {
+  margin: 0 0 12px;
+  color: var(--muted);
+}
+.capital-total strong {
+  color: var(--text);
+  font-size: 1.15rem;
+}
+.projects {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.projects li {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.projects li:last-child {
+  border-bottom: 0;
+}
+.project-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.project-name {
+  color: var(--text);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: var(--border);
+  text-underline-offset: 3px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.project-name:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+.project-cost {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.project-meta {
+  margin-top: 2px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.show-more {
+  margin-top: 12px;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.show-more:hover {
+  border-color: var(--accent);
+}
+@media (max-width: 560px) {
+  .budget-table th,
+  .budget-table td {
+    padding: 8px 6px;
+    font-size: 0.82rem;
+  }
+  .budget-table th:first-child {
+    padding-left: 10px;
+  }
+  .budget-table th:last-child,
+  .budget-table td:last-child {
+    padding-right: 10px;
+  }
+  .budget-table tbody th,
+  .budget-table tfoot th {
+    min-width: 0;
+  }
+}

@@ -360,6 +360,11 @@ def operating(year, rel, review):
                     f"{fmt(gap)} (page {tp}), and the usual explanation doesn't account for it."
                 )
         if rec:
+            rec.update({
+                "year": year,
+                "departments_spending": sum_gross, "departments_revenue": sum_rev,
+                "town_spending": tg, "town_revenue": tr - ttax, "source_url": url,
+            })
             review["reconcile"][year] = rec
     else:
         review["unclear"].append(f"{year}: couldn't find the town-wide totals page to check gross and revenue.")
@@ -628,6 +633,26 @@ def main():
     write_csv(DATA / "capital_projects.csv",
               ["year", "project_name", "department", "cost", "funding_source", "source_url", "page"],
               cap_rows)
+    # Why department totals differ from the town-wide page (shown as a note
+    # on the website's Budget page; explained in data/review/budget.md).
+    write_csv(DATA / "budget_reconciliation.csv",
+              ["year", "departments_spending", "departments_revenue", "town_spending",
+               "town_revenue", "library_revenue", "library_debt", "other_costs",
+               "other_recoveries", "town_page", "library_page", "source_url"],
+              [{
+                  "year": r["year"],
+                  "departments_spending": money(r["departments_spending"]),
+                  "departments_revenue": money(r["departments_revenue"]),
+                  "town_spending": money(r["town_spending"]),
+                  "town_revenue": money(r["town_revenue"]),
+                  "library_revenue": money(r["lib_rev"]),
+                  "library_debt": money(r["repeated"]),
+                  "other_costs": money(r["other_e"]),
+                  "other_recoveries": money(r["other_r"]),
+                  "town_page": r["town_page"],
+                  "library_page": r["lib_page"],
+                  "source_url": r["source_url"],
+              } for r in review["reconcile"].values()])
 
     # ---- review file
     out = ["# Budget: checks and items to review", "",
