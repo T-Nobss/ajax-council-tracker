@@ -30,8 +30,23 @@ export default async function CouncillorPage({ params }) {
   const salaries = getSalaryHistory(c.id);
   const anyNotListed = salaries.some((s) => !s.listed);
   const listed = salaries.filter((s) => s.listed);
-  const sitsOnRegion = c.seats.some((s) => /mayor|regional/i.test(s.role));
-  const isMayor = c.seats.some((s) => /mayor/i.test(s.role));
+  // Durham pay note: based on the roles held during the salary years shown,
+  // not later ones (e.g. someone elected Mayor after serving as a
+  // Regional Councillor).
+  const salaryYears = new Set(salaries.map((s) => s.year));
+  const rolesInSalaryYears = c.seats
+    .filter((seat) => {
+      if (!seat.term) return false;
+      const from = Number(seat.term.start_date.slice(0, 4));
+      const to = Number(seat.term.end_date.slice(0, 4));
+      return [...salaryYears].some((y) => y >= from && y <= to);
+    })
+    .map((seat) => seat.role);
+  const regionalRoles = [
+    rolesInSalaryYears.some((r) => /mayor/i.test(r)) && "Mayor",
+    rolesInSalaryYears.some((r) => /regional/i.test(r)) && "a Regional Councillor",
+  ].filter(Boolean);
+  const sitsOnRegion = regionalRoles.length > 0;
 
   return (
     <>
@@ -88,7 +103,7 @@ export default async function CouncillorPage({ params }) {
               )}
               {sitsOnRegion && (
                 <p>
-                  As {isMayor ? "Mayor" : "a Regional Councillor"}, {c.name} is
+                  As {regionalRoles.join(" and as ")}, {c.name} was
                   also paid separately by the Region of Durham for sitting on
                   Regional Council. That pay isn&rsquo;t included here.
                 </p>

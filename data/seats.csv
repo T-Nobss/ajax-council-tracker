@@ -1,8 +1,15 @@
 councillor_id,term_id,role,ward
 shaun-collier,2022-2026,Mayor,
 marilyn-crawford,2022-2026,Regional Councillor,Ward 1
-rob-tyler-morin,2022-2026,Councillor,Ward 1
+rob-tyler-morin,2022-2026,Local Councillor,Ward 1
 sterling-lee,2022-2026,Regional Councillor,Ward 2
-nancy-henry,2022-2026,Councillor,Ward 2
+nancy-henry,2022-2026,Local Councillor,Ward 2
 joanne-dies,2022-2026,Regional Councillor,Ward 3
-lisa-bower,2022-2026,Councillor,Ward 3
+lisa-bower,2022-2026,Local Councillor,Ward 3
+marilyn-crawford,2026-2030,Mayor,
+rob-tyler-morin,2026-2030,Regional Councillor,Ward 1
+ranjith-paranivasagam,2026-2030,Regional Councillor,Ward 2
+stephanie-ashton,2026-2030,Regional Councillor,Ward 3
+kristy-mcdonald,2026-2030,Local Councillor,Ward 1
+nancy-henry,2026-2030,Local Councillor,Ward 2
+nick-papalambropoulos,2026-2030,Local Councillor,Ward 3

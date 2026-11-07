@@ -9,17 +9,46 @@ function seatLabel(seat) {
   return [seat.role, seat.ward].filter(Boolean).join(" · ");
 }
 
-export default function CouncillorList({ terms, councillors }) {
-  // Default to the most recent term.
-  const [term, setTerm] = useState(terms[0]?.id ?? ALL);
+// The term in office on a given day (YYYY-MM-DD). Before any term has
+// started, or between terms, fall back to the most recent one that started.
+function termInOffice(terms, today) {
+  const current = terms.find((t) => t.start_date <= today && today <= t.end_date);
+  if (current) return current.id;
+  const started = terms.find((t) => t.start_date <= today); // newest first
+  return (started ?? terms[0])?.id ?? ALL;
+}
 
-  // Respect ?term=... in the address so filtered views can be shared.
+const localToday = () => {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
+
+export default function CouncillorList({ terms, councillors, buildDate }) {
+  // "Today" starts as the build date (so the server HTML matches) and is
+  // corrected to the visitor's date once the page loads, because the site
+  // isn't rebuilt every day.
+  const [today, setToday] = useState(buildDate);
+  const [term, setTerm] = useState(() => termInOffice(terms, buildDate));
+
+  // Respect ?term=... in the address so filtered views can be shared;
+  // otherwise show the council in office today.
   useEffect(() => {
+    const now = localToday();
+    setToday(now);
     const fromUrl = new URLSearchParams(window.location.search).get("term");
     if (fromUrl && (fromUrl === ALL || terms.some((t) => t.id === fromUrl))) {
       setTerm(fromUrl);
+    } else {
+      setTerm(termInOffice(terms, now));
     }
   }, [terms]);
+
+  const termLabel = (t) => {
+    if (t.start_date > today) return `${t.name} (incoming)`;
+    if (t.start_date <= today && today <= t.end_date) return `${t.name} (current)`;
+    return t.name;
+  };
 
   function changeTerm(value) {
     setTerm(value);
@@ -64,7 +93,7 @@ export default function CouncillorList({ terms, councillors }) {
           >
             {terms.map((t) => (
               <option key={t.id} value={t.id}>
-                {t.name}
+                {termLabel(t)}
               </option>
             ))}
             <option value={ALL}>All terms</option>
