@@ -4,17 +4,19 @@ import { getPhotos } from "@/lib/data";
 // Full-width photo banner with the page title over it.
 // `photo` is a file listed in data/photos.csv (e.g. "photos/aerial.jpg").
 export default function PageHero({ photo, alt, title, lead, focus = "center", size = "page", children }) {
-  const credit = getPhotos().find((p) => p.file === photo);
+  const credit = photo ? getPhotos().find((p) => p.file === photo) : null;
   return (
-    <section className={`hero hero-${size}`}>
-      <img
-        className="hero-img"
-        src={`/${photo}`}
-        alt={alt}
-        style={{ objectPosition: focus }}
-        fetchPriority="high"
-      />
-      <div className="hero-shade" aria-hidden="true" />
+    <section className={`hero hero-${size}${photo ? "" : " hero-plain"}`}>
+      {photo && (
+        <img
+          className="hero-img"
+          src={`/${photo}`}
+          alt={alt}
+          style={{ objectPosition: focus }}
+          fetchPriority="high"
+        />
+      )}
+      {photo && <div className="hero-shade" aria-hidden="true" />}
       <div className="container hero-inner">
         <h1>{title}</h1>
         {lead && <p className="hero-lead">{lead}</p>}

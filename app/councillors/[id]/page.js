@@ -10,6 +10,7 @@ import {
   getPayHistory,
 } from "@/lib/data";
 import ExpensesSection from "./ExpensesSection";
+import VotesSection from "./VotesSection";
 import Avatar from "../../components/Avatar";
 import SalarySection from "./SalarySection";
 
@@ -205,8 +206,7 @@ export default async function CouncillorPage({ params }) {
 
       <ExpensesSection name={c.name} years={expenseYears} />
 
-      <h2>Votes</h2>
-      <div className="notice">Voting records will appear here.</div>
+      <VotesSection id={c.id} name={c.name} />
     </>
   );
 }
