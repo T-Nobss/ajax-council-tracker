@@ -11,17 +11,18 @@ GGC meeting in the term it:
   - adds a row to data/meetings.csv  (id, term_id, date, type, minutes_url)
     Rows for other terms already in the file are kept.
   - saves the minutes PDF to sources/minutes/
-  - looks for "Remuneration" in agenda item titles and attachment names, and
-    (for older meetings whose agenda is one PDF) in the agenda's text. Matching
-    files are saved to sources/expenses/ and listed in
-    data/review/remuneration-found.md
+  - looks for "Remuneration" in agenda item titles and attachment names. Older
+    meetings have the whole agenda in one PDF; there the PDF's bookmarks (the
+    agenda item titles) are searched and only the matching item's pages are
+    saved. Matches go to sources/expenses/ and data/review/remuneration-found.md
   - writes data/review/meetings.md with anything that needs checking
 
 Safe to re-run: files already downloaded are skipped, so a re-run only fetches
 what's new. The portal was being migrated in 2026 (older meetings were moved
 over from the previous system, events.ajax.ca), so re-run it from time to time.
 
-Needs Python 3.9+ and `pdftotext` (poppler-utils) for searching agenda PDFs.
+Needs Python 3.9+, `pypdf` (pip install pypdf) to read agenda bookmarks and
+save single agenda items, and `pdftotext` (poppler-utils) as a fallback.
 """
 
 import csv
@@ -34,6 +35,11 @@ import urllib.parse
 import urllib.request
 from datetime import date
 from pathlib import Path
+
+try:  # used to read agenda bookmarks and save single agenda items
+    from pypdf import PdfReader, PdfWriter
+except ImportError:
+    PdfReader = PdfWriter = None
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -122,6 +128,73 @@ def pdf_text(path):
                               capture_output=True, text=True, check=True).stdout
     except Exception:
         return ""
+
+
+def bookmarks(reader):
+    """[(depth, title, first page)] from a PDF's bookmarks, in order."""
+    out = []
+
+    def walk(items, depth):
+        for o in items:
+            if isinstance(o, list):
+                walk(o, depth + 1)
+                continue
+            try:
+                out.append((depth, o.title.strip(), reader.get_destination_page_number(o)))
+            except Exception:
+                pass
+
+    walk(reader.outline, 0)
+    return out
+
+
+def search_agenda_pdf(path, label, d, mtype, mid, url, fname, review):
+    """Find agenda items whose title mentions remuneration in a one-PDF agenda."""
+    matches = []
+    if PdfReader is None:
+        review["errors"].append(f"{label}: pypdf isn't installed, so the agenda PDF wasn't searched "
+                                f"(pip install pypdf)")
+        return matches
+    reader = PdfReader(str(path))
+    marks = bookmarks(reader)
+    last = len(reader.pages) - 1
+    if marks:
+        for i, (depth, title, first) in enumerate(marks):
+            if not KEYWORD.search(title):
+                continue
+            # The item runs until the next bookmark at the same or a higher level.
+            end = next((p for dd, _, p in marks[i + 1:] if dd <= depth and p > first), last + 1) - 1
+            end = max(end, first)
+            dest = EXPENSES_DIR / f"{mid}-{safe_name(title)}.pdf"
+            if not dest.exists():
+                writer = PdfWriter()
+                for pg in range(first, end + 1):
+                    writer.add_page(reader.pages[pg])
+                with open(dest, "wb") as f:
+                    writer.write(f)
+            matches.append({"date": d, "type": mtype, "where": f"Agenda item: {title}",
+                            "file": f"{fname}, pages {first + 1}–{end + 1}", "url": f"{url}#page={first + 1}",
+                            "saved": str(dest.relative_to(ROOT))})
+        return matches
+
+    # No bookmarks: look for heading-like lines (numbered items, report
+    # subjects, by-law titles) and save the pages they're on.
+    heading = re.compile(r"^\s*(\d+(\.\d+)*\.?\s+|Subject:|A By-law to)", re.I)
+    pages = pdf_text(path).split("\f")
+    hits = [(i, ln.strip()) for i, pg in enumerate(pages) for ln in pg.splitlines()
+            if KEYWORD.search(ln) and heading.match(ln)]
+    for i, line in hits:
+        dest = EXPENSES_DIR / f"{mid}-page{i + 1}.pdf"
+        if not dest.exists():
+            writer = PdfWriter()
+            writer.add_page(reader.pages[i])
+            with open(dest, "wb") as f:
+                writer.write(f)
+        matches.append({"date": d, "type": mtype,
+                        "where": f"Heading in agenda (no bookmarks, check by hand): {line[:120]}",
+                        "file": f"{fname}, page {i + 1}", "url": f"{url}#page={i + 1}",
+                        "saved": str(dest.relative_to(ROOT))})
+    return matches
 
 
 # ------------------------------------------------------------------- dates
@@ -245,29 +318,20 @@ def main():
                 found.append({"date": d, "type": mtype, "where": f"Agenda item: {title}",
                               "file": "(no attachment)", "url": page_url, "saved": ""})
 
-        # ---- older meetings: agenda is one PDF, items are inside it
+        # ---- older meetings: the agenda is one PDF with the items inside it.
+        # Its bookmarks are the agenda item titles, so match those and save
+        # just that item's pages.
         if agenda and not items:
             url, fname = agenda
             tmp = EXPENSES_DIR / f".agenda-{mid}.pdf"
             try:
                 body, _ = get(url, binary=True)
                 tmp.write_bytes(body)
-                pages = pdf_text(tmp).split("\f")
-                hits = [(i, ln.strip()) for i, p in enumerate(pages, 1)
-                        for ln in p.splitlines() if KEYWORD.search(ln)]
-                if hits:
-                    dest = EXPENSES_DIR / f"{mid}-{safe_name(fname)}"
-                    tmp.replace(dest)
-                    pages_hit = sorted({i for i, _ in hits})
-                    first = hits[0][1][:120]
-                    found.append({"date": d, "type": mtype,
-                                  "where": f"Inside the agenda PDF, page(s) {', '.join(map(str, pages_hit))}: “{first}”",
-                                  "file": fname, "url": url, "saved": str(dest.relative_to(ROOT))})
-                else:
-                    tmp.unlink(missing_ok=True)
+                found.extend(search_agenda_pdf(tmp, label, d, mtype, mid, url, fname, review))
             except Exception as e:
-                tmp.unlink(missing_ok=True)
                 review["errors"].append(f"{label}: couldn't search the agenda PDF ({e})")
+            finally:
+                tmp.unlink(missing_ok=True)
 
         rows.append({"id": mid, "term_id": term_id, "date": d, "type": mtype, "minutes_url": minutes_url})
 
@@ -306,8 +370,9 @@ def write_outputs(term_id, start, end, rows, found, review, listed):
     lines = ["# Remuneration found in meeting documents", "",
              f"Generated by `scripts/fetch_meetings.py` on {today}, for the {term_id} term "
              f"({start} to {end}).", "",
-             "Agenda items or attachments with **Remuneration** in their title. For older "
-             "meetings, whose agenda is a single PDF, the agenda text itself was searched. "
+             "Agenda items or attachments with **Remuneration** in their title. Older "
+             "meetings have the whole agenda in one PDF; for those the agenda item titles "
+             "(the PDF's bookmarks) were searched and only that item's pages were saved. "
              "Saved copies are in `sources/expenses/`.", ""]
     if found:
         lines += ["| Meeting date | Meeting | Where | File | Saved as |", "|---|---|---|---|---|"]
