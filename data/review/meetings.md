@@ -36,3 +36,41 @@ None.
 ### Errors
 
 None.
+
+## 2018-2022 term
+
+Checked on 2026-11-07.
+
+- 620 meetings listed on the portal in total
+- 130 Council / GGC meetings in this term written to `data/meetings.csv`
+- 121 with minutes saved in `sources/minutes/`
+- 11 remuneration match(es), see `remuneration-found.md`
+
+### Past meetings with no minutes on the portal
+
+- 2019-07-08 Council (https://ajax.cityconnections.civicflow.co/p/town-of-ajax/387)
+- 2019-07-08 General Government Committee (https://ajax.cityconnections.civicflow.co/p/town-of-ajax/388)
+- 2020-03-23 Council (https://ajax.cityconnections.civicflow.co/p/town-of-ajax/199)
+- 2020-04-14 General Government Committee (https://ajax.cityconnections.civicflow.co/p/town-of-ajax/245)
+- 2020-05-11 General Government Committee (https://ajax.cityconnections.civicflow.co/p/town-of-ajax/291)
+- 2020-11-30 General Government Committee (https://ajax.cityconnections.civicflow.co/p/town-of-ajax/568)
+- 2021-11-01 General Government Committee (https://ajax.cityconnections.civicflow.co/p/town-of-ajax/514)
+- 2022-01-17 General Government Committee (https://ajax.cityconnections.civicflow.co/p/town-of-ajax/77)
+- 2022-09-19 Council (https://ajax.cityconnections.civicflow.co/p/town-of-ajax/454)
+
+### Upcoming meetings (no minutes yet)
+
+None.
+
+### Cancelled meetings
+
+None.
+
+### Date in the title differs from the listed start date
+
+- 02-16-2021 General Government Committee (portal id 135): start says 2021-02-26, title says 2021-02-16. Used 2021-02-16.
+- 03-25-2019 Council (portal id 204): start says 2019-03-23, title says 2019-03-25. Used 2019-03-25.
+
+### Errors
+
+None.
