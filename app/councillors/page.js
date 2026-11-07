@@ -4,12 +4,7 @@ import CouncillorList from "./CouncillorList";
 export const metadata = { title: "Councillors" };
 
 export default function CouncillorsPage() {
-  const terms = getTermsSorted().map((t) => ({
-    id: t.id,
-    name: t.name,
-    start_date: t.start_date,
-    end_date: t.end_date,
-  }));
+  const terms = getTermsSorted().map((t) => ({ id: t.id, name: t.name }));
   const councillors = getCouncillorsWithSeats().map((c) => ({
     id: c.id,
     name: c.name,
@@ -28,11 +23,7 @@ export default function CouncillorsPage() {
         Members of Ajax Town Council, the terms they served and the wards they
         represent.
       </p>
-      <CouncillorList
-        terms={terms}
-        councillors={councillors}
-        buildDate={new Date().toISOString().slice(0, 10)}
-      />
+      <CouncillorList terms={terms} councillors={councillors} />
     </>
   );
 }

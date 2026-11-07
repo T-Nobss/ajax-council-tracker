@@ -69,7 +69,7 @@ jane-smith,Jane Smith
 **seats.csv**
 ```
 councillor_id,term_id,role,ward
-jane-smith,2022-2026,Regional & Local Councillor,Ward 1
+jane-smith,2022-2026,Local Councillor,Ward 1
 ```
 
 **meetings.csv**
@@ -108,6 +108,13 @@ jane-smith,2024,Mileage,1250.40,https://example.com/expenses-2024.pdf
   automatically when saving as CSV.
 - **Sources:** include a link to the original public document wherever there's
   a `url` column, so readers can check it themselves.
+- **Roles** (in `seats.csv`): use exactly `Mayor`, `Regional Councillor` or
+  `Local Councillor`, spelled the same way every time. Leave `ward` blank for
+  the Mayor.
+- **New council term:** add a row to `terms.csv` and the members' rows to
+  `seats.csv` (and any new people to `councillors.csv`). The Councillors page
+  always opens on the newest term that has members, so nothing else needs
+  changing.
 - **Votes:** `votes.csv` is only needed for recorded votes. Use the same words
   every time (e.g. `Yes`, `No`, `Absent`).
 
