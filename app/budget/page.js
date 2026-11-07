@@ -1,7 +1,10 @@
 import {
+  getActuals,
   getBudget,
+  getBudgetAdoption,
   getBudgetReconciliation,
   getCapitalProjects,
+  getDocuments,
 } from "@/lib/data";
 import BudgetView from "./BudgetView";
 
@@ -13,10 +16,13 @@ export default function BudgetPage() {
   const budget = getBudget();
   const capital = getCapitalProjects();
   const recon = getBudgetReconciliation();
+  const actuals = getActuals();
+  const documents = getDocuments();
+  const adoption = getBudgetAdoption();
 
-  const years = [...new Set([...budget, ...capital].map((r) => r.year))].sort(
-    (a, b) => b.localeCompare(a)
-  );
+  const years = [
+    ...new Set([...budget, ...capital, ...actuals, ...documents].map((r) => r.year)),
+  ].sort((a, b) => b.localeCompare(a));
 
   const byYear = {};
   for (const year of years) {
@@ -37,6 +43,8 @@ export default function BudgetPage() {
       })
       .sort((a, b) => b.cost - a.cost);
     const rc = recon.find((r) => r.year === year);
+    const act = actuals.filter((r) => r.year === year);
+    const toLine = (r) => ({ category: r.category, budget: num(r.budget), actual: num(r.actual) });
 
     byYear[year] = {
       operating: ops.map((r) => ({
@@ -54,6 +62,16 @@ export default function BudgetPage() {
             Object.entries(rc).map(([k, v]) => [k, k === "source_url" ? v : num(v)])
           )
         : null,
+      actuals: act.length
+        ? {
+            revenue: act.filter((r) => r.section === "revenue").map(toLine),
+            expense: act.filter((r) => r.section === "expense").map(toLine),
+            source: act[0].source_url,
+            page: act[0].page,
+          }
+        : null,
+      documents: documents.filter((r) => r.year === year),
+      adoption: adoption.find((r) => r.year === year) ?? null,
     };
   }
 
@@ -61,8 +79,8 @@ export default function BudgetPage() {
     <>
       <h1>Budget</h1>
       <p className="lead">
-        How the Town of Ajax plans to spend each year, from its published budget
-        books.
+        What the Town of Ajax planned to spend, what it actually spent, and the
+        documents behind both.
       </p>
       {years.length === 0 ? (
         <div className="notice">No budget data has been added yet.</div>

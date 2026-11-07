@@ -510,3 +510,134 @@ h2 {
     min-width: 0;
   }
 }
+
+/* Budget tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin: 4px 0 8px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.tab {
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  padding: 10px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tab:hover {
+  color: var(--text);
+}
+.tab[aria-selected="true"] {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  border-radius: 6px 6px 0 0;
+}
+.tab-panel > .heading-row:first-child {
+  margin-top: 20px;
+}
+.tab-panel > .notice:first-child {
+  margin-top: 20px;
+}
+
+/* Actual tab */
+.stats {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 600px) {
+  .stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.stats li {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.stat-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.stat-value {
+  display: block;
+  font-size: 1.3rem;
+  font-variant-numeric: tabular-nums;
+}
+.stat-sub {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.diff-up,
+.diff-down {
+  font-variant-numeric: tabular-nums;
+}
+.help-list {
+  margin: 0 0 10px;
+  padding-left: 18px;
+}
+.help-list li {
+  margin-bottom: 4px;
+}
+
+/* Documents tab */
+.doc-adopted {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.doc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.doc-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.doc-list li:last-child {
+  border-bottom: 0;
+}
+.doc-list a {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.doc-type {
+  flex: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+.doc-more {
+  margin-top: 20px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}

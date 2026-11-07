@@ -36,6 +36,9 @@ or any text editor.
 | `budget.csv` | one department's operating budget for one year | `year`, `department`, `gross_expenditure`, `revenue`, `net_budget`, `source_url`, `page` |
 | `capital_projects.csv` | one capital project in its budget year | `year`, `project_name`, `department`, `cost`, `funding_source`, `source_url`, `page` |
 | `budget_reconciliation.csv` | why one year's department totals differ from the budget book's town-wide page (shown as a note on the Budget page) | `year`, `departments_spending`, `departments_revenue`, `town_spending`, `town_revenue`, `library_revenue`, `library_debt`, `other_costs`, `other_recoveries`, `town_page`, `library_page`, `source_url` |
+| `actuals.csv` | one line of the Town's audited results for one year (revenue by source, spending by service area) | `year`, `section`, `category`, `budget`, `actual`, `source_url`, `page` |
+| `documents.csv` | one budget or financial report document (shown on the Budget page's Documents tab) | `year`, `group`, `title`, `url` |
+| `budget_adoption.csv` | who adopted each year's budget, and when | `year`, `adopted_by`, `date`, `source` |
 
 `salaries.csv` is filled in automatically by a script (see
 [Updating salaries](#updating-salaries-the-sunshine-list) below), so you
@@ -184,6 +187,29 @@ book is laid out differently, the checks in the review file will show it.
 
 ---
 
+## Updating actual results (financial statements)
+
+The Town's audited financial statements are saved in
+`sources/financial-statements/`. Each spring/summer a new one comes out. To add it:
+
+1. Save the PDF into `sources/financial-statements/`.
+2. Add its web address to the `STATEMENTS` list at the top of
+   `scripts/extract_actuals.py`.
+3. Run `python3 scripts/extract_actuals.py`, then check
+   `data/review/actuals.md`.
+4. Add a row for it to `data/documents.csv` (group `Financial statements`).
+
+`documents.csv` can be edited by hand any time to add presentations or other
+reports. Use group `Budget` or `Financial statements`.
+
+The Budget page has three tabs for each year: **Planned** (the budget books),
+**Actual** (the audited results) and **Documents** (links to the originals).
+Note that the actual results are grouped by service area, not department,
+and are counted differently, so they don't match the Planned tab. The "i"
+notes on the page explain this to readers.
+
+---
+
 ## Updating the live site
 
 The site is hosted on Vercel and connected to this project's GitHub repository.
@@ -214,6 +240,8 @@ npm run build   # production build
   file (additions, changes, deletions). Needs Node 18+ and network
   access to www.ontario.ca. Behind an HTTP proxy, run it with
   `NODE_USE_ENV_PROXY=1`.
+- `scripts/extract_actuals.py` reads the "Consolidated statement of operations"
+  page and checks lines against the statement's totals and surplus.
 - `scripts/extract_budget.py` needs Python 3 and `pdftotext` (poppler-utils).
   It only reads local PDFs. `sources/` is excluded from Vercel uploads via
   `.vercelignore`.
