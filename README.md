@@ -210,6 +210,30 @@ notes on the page explain this to readers.
 
 ---
 
+## Updating meetings and minutes
+
+`scripts/fetch_meetings.py` collects every Council, Special Council and
+General Government Committee meeting for a council term from the Town's
+meeting portal (https://ajax.cityconnections.civicflow.co/p/town-of-ajax),
+which replaced events.ajax.ca in 2026:
+
+```bash
+pip install pypdf                          # once
+python3 scripts/fetch_meetings.py          # 2022-2026 term
+python3 scripts/fetch_meetings.py 2026-2030
+```
+
+It fills in `meetings.csv`, saves minutes to `sources/minutes/`, and saves
+any agenda item or attachment with "Remuneration" in its title to
+`sources/expenses/` (listed in `data/review/remuneration-found.md`). For
+older meetings it saves just that agenda item's pages, not the whole agenda.
+Check `data/review/meetings.md` afterwards for meetings with no minutes.
+
+The portal was still being updated when this was written, so re-run the
+script now and then. It only downloads what's new.
+
+---
+
 ## Updating the live site
 
 The site is hosted on Vercel and connected to this project's GitHub repository.
