@@ -127,12 +127,13 @@ Ontario publishes the pay of every public sector employee who earned
 the following spring. For example, 2025 pay was published in March 2026.
 
 A script downloads the list, picks out the Town of Ajax's Mayor and
-Councillors, matches them to `councillors.csv`, and rewrites `salaries.csv`.
-Ask a developer (or Claude) to run it each spring once the new year is out:
+Councillors, matches them to `councillors.csv`, and updates `salaries.csv`.
+It only replaces the years you ask for, so earlier years are kept. Ask a
+developer (or Claude) to run it each spring once the new year is out:
 
 ```bash
-npm run salaries                # 2022–2025
-npm run salaries -- 2022 2026   # include a newer year once it's published
+npm run salaries                # 2019–2025
+npm run salaries -- 2026        # add one new year once it's published
 ```
 
 Afterwards, open `data/review/salaries.md`. It lists:
@@ -172,9 +173,11 @@ npm run build   # production build
 - `lib/data.js` reads and parses the CSV files. Pages read the data on the
   server at build time, so the deployed site is static and fast.
 - Pages live in `app/`. Votes, Expenses and Budget are placeholders for now.
-- `scripts/fetch-salaries.mjs` builds `data/salaries.csv` from the file index at
-  `https://www.ontario.ca/public-sector-salary-disclosure_artifacts/pssdfiles.json`
-  (2021 onward; older years are on data.ontario.ca). It applies each year's
-  addendum file (additions, changes, deletions). Needs Node 18+ and network
+- `scripts/fetch-salaries.mjs` updates `data/salaries.csv` for the years given,
+  keeping rows for other years. 2021 onward comes from the file index at
+  `https://www.ontario.ca/public-sector-salary-disclosure_artifacts/pssdfiles.json`,
+  earlier years from the data.ontario.ca CKAN catalogue
+  (`public-sector-salary-disclosure-YYYY`). It applies each year's addendum
+  file (additions, changes, deletions). Needs Node 18+ and network
   access to www.ontario.ca. Behind an HTTP proxy, run it with
   `NODE_USE_ENV_PROXY=1`.

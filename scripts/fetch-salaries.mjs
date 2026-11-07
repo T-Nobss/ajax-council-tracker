@@ -1,18 +1,21 @@
 // Builds data/salaries.csv from Ontario's Public Sector Salary Disclosure
 // (the "Sunshine List").
 //
-//   npm run salaries                # years 2022–2025
-//   npm run salaries -- 2022 2026   # a different range (first and last year)
+//   npm run salaries                # years 2019–2025
+//   npm run salaries -- 2026        # just one year
+//   npm run salaries -- 2019 2026   # a range (first and last year)
 //
 // What it does:
-//   1. Reads Ontario's index of Sunshine List files for every year.
+//   1. Finds each year's Sunshine List files: 2021 onward from Ontario's
+//      index on ontario.ca, earlier years from the data.ontario.ca catalogue.
 //   2. Downloads each year's main list ("Compendium") and, if there is one,
 //      its correction file ("Addendum": additions, changes and deletions).
 //   3. Keeps rows where the employer is the Town of Ajax and the job title
 //      contains "Mayor" or "Councillor".
 //   4. Matches each person to a name in data/councillors.csv.
-//   5. Writes data/salaries.csv (replacing it) and data/review/salaries.md,
-//      which lists anything that needs a human to check.
+//   5. Updates data/salaries.csv: rows for the years it ran are replaced,
+//      rows for other years are kept. Writes data/review/salaries.md, which
+//      lists anything from this run that needs a human to check.
 //
 // Note: the list for year X covers money paid in year X and is published
 // in spring of year X+1 (e.g. the 2025 list came out in March 2026).
@@ -33,13 +36,18 @@ const INDEX_URL = `${SITE}/public-sector-salary-disclosure_artifacts/pssdfiles.j
 const pageUrl = (year) =>
   `${SITE}/public-sector-salary-disclosure/${year}/all-sectors-and-seconded-employees/`;
 
+// Years before 2021 live in the provincial open data catalogue.
+const CATALOGUE = "https://data.ontario.ca";
+const cataloguePage = (year) =>
+  `${CATALOGUE}/dataset/public-sector-salary-disclosure-${year}`;
+
 const EMPLOYER = "town of ajax";
 const TITLE_RE = /mayor|councillor/i;
 
 // ---------- helpers ----------
 
 const args = process.argv.slice(2).map(Number).filter(Boolean);
-const FIRST_YEAR = args[0] ?? 2022;
+const FIRST_YEAR = args[0] ?? 2019;
 const LAST_YEAR = args[1] ?? args[0] ?? 2025;
 
 async function get(url) {
@@ -131,6 +139,37 @@ function matchCouncillor(first, last) {
   return null;
 }
 
+// Where to download one year's files from, and what to link to as the source.
+// Returns null if that year hasn't been published.
+async function findFiles(index, year) {
+  const files = index[String(year)];
+  if (files?.Compendium?.en?.csv) {
+    return {
+      compendium: SITE + files.Compendium.en.csv,
+      addendum: files.Addendum?.en?.csv ? SITE + files.Addendum.en.csv : null,
+      source: pageUrl(year),
+    };
+  }
+
+  const res = await fetch(
+    `${CATALOGUE}/api/3/action/package_show?id=public-sector-salary-disclosure-${year}`
+  );
+  if (!res.ok) return null;
+  const pkg = (await res.json()).result;
+  // English files are named like en-2019-pssd-compendium.csv,
+  // en-2019-pssd-addendum.csv (older years: en-2015-pssd.csv).
+  const english = (pkg?.resources ?? [])
+    .map((r) => r.url)
+    .filter((u) => /\/en-\d{4}-pssd[^/]*\.csv$/i.test(u));
+  const compendium = english.find((u) => !/addendum|no-salar|dictionary/i.test(u));
+  if (!compendium) return null;
+  return {
+    compendium,
+    addendum: english.find((u) => /addendum/i.test(u)) ?? null,
+    source: cataloguePage(year),
+  };
+}
+
 // ---------- main ----------
 
 async function main() {
@@ -144,9 +183,8 @@ async function main() {
   const notes = [];
 
   for (let year = FIRST_YEAR; year <= LAST_YEAR; year++) {
-    const files = index[String(year)];
-    const compendium = files?.Compendium?.en?.csv;
-    if (!compendium) {
+    const files = await findFiles(index, year);
+    if (!files) {
       missingYears.push(year);
       console.log(`${year}: not published yet (expected spring ${year + 1})`);
       continue;
@@ -154,14 +192,13 @@ async function main() {
 
     console.log(`${year}: downloading list…`);
     const records = new Map();
-    for (const r of ajaxRows(await (await get(SITE + compendium)).text())) {
+    for (const r of ajaxRows(await (await get(files.compendium)).text())) {
       records.set(personKey(r), r);
     }
 
-    const addendum = files?.Addendum?.en?.csv;
-    if (addendum) {
+    if (files.addendum) {
       console.log(`${year}: applying corrections…`);
-      for (const r of ajaxRows(await (await get(SITE + addendum)).text())) {
+      for (const r of ajaxRows(await (await get(files.addendum)).text())) {
         const k = personKey(r);
         const s = r.status.toLowerCase();
         if (s === "deletion") records.delete(k);
@@ -185,16 +222,25 @@ async function main() {
         year: String(year),
         salary: money(r.salary),
         taxable_benefits: money(r.benefits),
-        source_url: pageUrl(year),
+        source_url: files.source,
       });
     }
     console.log(`${year}: ${records.size} Ajax Mayor/Councillor record(s)`);
   }
 
-  // Write salaries.csv
+  // Update salaries.csv: keep rows for years outside this run.
+  const ranYears = new Set();
+  for (let y = FIRST_YEAR; y <= LAST_YEAR; y++) {
+    if (!missingYears.includes(y)) ranYears.add(String(y));
+  }
+  const kept = fs.existsSync(OUT_CSV)
+    ? parseCsv(fs.readFileSync(OUT_CSV, "utf8")).filter((r) => !ranYears.has(r.year))
+    : [];
+  const written = results.length;
+  results.push(...kept);
   const order = new Map(councillors.map((c, i) => [c.id, i]));
   results.sort(
-    (a, b) => a.year.localeCompare(b.year) || order.get(a.councillor_id) - order.get(b.councillor_id)
+    (a, b) => a.year.localeCompare(b.year) || (order.get(a.councillor_id) ?? 1e9) - (order.get(b.councillor_id) ?? 1e9)
   );
   const cols = ["councillor_id", "year", "salary", "taxable_benefits", "source_url"];
   const csv = [cols.join(","), ...results.map((r) => cols.map((c) => csvCell(r[c])).join(","))].join("\n") + "\n";
@@ -206,7 +252,8 @@ async function main() {
   const review = `# Salaries: items to review
 
 Generated by \`scripts/fetch-salaries.mjs\` on ${today}, covering ${FIRST_YEAR}–${LAST_YEAR}.
-It wrote ${results.length} row(s) to \`data/salaries.csv\`.
+It wrote ${written} row(s) for these years to \`data/salaries.csv\` (the file now has
+${results.length} row(s) in total; other years were left as they were).
 
 ## Names that didn't match anyone in councillors.csv
 
@@ -242,7 +289,7 @@ ${list(notes, "None for Town of Ajax.")}
   fs.mkdirSync(path.dirname(OUT_REVIEW), { recursive: true });
   fs.writeFileSync(OUT_REVIEW, review);
 
-  console.log(`\nWrote ${results.length} row(s) to data/salaries.csv`);
+  console.log(`\nWrote ${written} row(s) for ${FIRST_YEAR}–${LAST_YEAR}; salaries.csv now has ${results.length} row(s)`);
   console.log(`Unmatched: ${unmatched.length}, partial matches: ${partial.length}`);
   console.log("See data/review/salaries.md");
 }

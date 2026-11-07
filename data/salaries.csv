@@ -1,4 +1,7 @@
 councillor_id,year,salary,taxable_benefits,source_url
+shaun-collier,2019,128060.00,11882.28,https://data.ontario.ca/dataset/public-sector-salary-disclosure-2019
+shaun-collier,2020,115012.00,26986.44,https://data.ontario.ca/dataset/public-sector-salary-disclosure-2020
+shaun-collier,2021,115012.00,26996.88,https://www.ontario.ca/public-sector-salary-disclosure/2021/all-sectors-and-seconded-employees/
 shaun-collier,2022,116204.00,27091.48,https://www.ontario.ca/public-sector-salary-disclosure/2022/all-sectors-and-seconded-employees/
 shaun-collier,2023,156665.05,31558.31,https://www.ontario.ca/public-sector-salary-disclosure/2023/all-sectors-and-seconded-employees/
 shaun-collier,2024,188355.94,32010.30,https://www.ontario.ca/public-sector-salary-disclosure/2024/all-sectors-and-seconded-employees/
