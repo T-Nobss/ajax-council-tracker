@@ -8,7 +8,7 @@ import {
 } from "@/lib/data";
 import BudgetView from "./BudgetView";
 
-export const metadata = { title: "Budget" };
+export const metadata = { title: "Spending" };
 
 const num = (v) => Number(v) || 0;
 
@@ -77,7 +77,7 @@ export default function BudgetPage() {
 
   return (
     <>
-      <h1>Budget</h1>
+      <h1>Spending</h1>
       <p className="lead">
         What the Town of Ajax planned to spend, what it actually spent, and the
         documents behind both.

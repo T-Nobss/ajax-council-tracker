@@ -19,7 +19,7 @@ const nav = [
   { href: "/councillors", label: "Councillors" },
   { href: "/votes", label: "Votes" },
   { href: "/expenses", label: "Expenses" },
-  { href: "/budget", label: "Budget" },
+  { href: "/spending", label: "Spending" },
 ];
 
 export default function RootLayout({ children }) {

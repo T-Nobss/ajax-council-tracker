@@ -1,4 +1,4 @@
-// Number formatting shared by the Budget page tabs.
+// Number formatting shared by the Spending page tabs.
 
 export const fmtFull = (n) =>
   n.toLocaleString("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 });

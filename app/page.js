@@ -17,9 +17,9 @@ const sections = [
     blurb: "What each councillor spent, by year and category.",
   },
   {
-    href: "/budget",
-    title: "Budget",
-    blurb: "How the Town of Ajax plans to spend its money.",
+    href: "/spending",
+    title: "Spending",
+    blurb: "What the Town planned to spend, what it actually spent, and the budget documents.",
   },
 ];
 

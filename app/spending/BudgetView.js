@@ -60,7 +60,7 @@ export default function BudgetView({ years, byYear }) {
         </select>
       </div>
 
-      <div className="tabs" role="tablist" aria-label="Budget views" onKeyDown={onTabKey}>
+      <div className="tabs" role="tablist" aria-label="Spending views" onKeyDown={onTabKey}>
         {TABS.map((t) => (
           <button
             key={t.id}

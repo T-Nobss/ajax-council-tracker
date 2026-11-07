@@ -35,9 +35,9 @@ or any text editor.
 | `salaries.csv` | one year of Town of Ajax pay for a member of council | `councillor_id`, `year`, `salary`, `taxable_benefits`, `source_url` |
 | `budget.csv` | one department's operating budget for one year | `year`, `department`, `gross_expenditure`, `revenue`, `net_budget`, `source_url`, `page` |
 | `capital_projects.csv` | one capital project in its budget year | `year`, `project_name`, `department`, `cost`, `funding_source`, `source_url`, `page` |
-| `budget_reconciliation.csv` | why one year's department totals differ from the budget book's town-wide page (shown as a note on the Budget page) | `year`, `departments_spending`, `departments_revenue`, `town_spending`, `town_revenue`, `library_revenue`, `library_debt`, `other_costs`, `other_recoveries`, `town_page`, `library_page`, `source_url` |
+| `budget_reconciliation.csv` | why one year's department totals differ from the budget book's town-wide page (shown as a note on the Spending page) | `year`, `departments_spending`, `departments_revenue`, `town_spending`, `town_revenue`, `library_revenue`, `library_debt`, `other_costs`, `other_recoveries`, `town_page`, `library_page`, `source_url` |
 | `actuals.csv` | one line of the Town's audited results for one year (revenue by source, spending by service area) | `year`, `section`, `category`, `budget`, `actual`, `source_url`, `page` |
-| `documents.csv` | one budget or financial report document (shown on the Budget page's Documents tab) | `year`, `group`, `title`, `url` |
+| `documents.csv` | one budget or financial report document (shown on the Spending page's Documents tab) | `year`, `group`, `title`, `url` |
 | `budget_adoption.csv` | who adopted each year's budget, and when | `year`, `adopted_by`, `date`, `source` |
 
 `salaries.csv` is filled in automatically by a script (see
@@ -202,7 +202,7 @@ The Town's audited financial statements are saved in
 `documents.csv` can be edited by hand any time to add presentations or other
 reports. Use group `Budget` or `Financial statements`.
 
-The Budget page has three tabs for each year: **Planned** (the budget books),
+The Spending page has three tabs for each year: **Planned** (the budget books),
 **Actual** (the audited results) and **Documents** (links to the originals).
 Note that the actual results are grouped by service area, not department,
 and are counted differently, so they don't match the Planned tab. The "i"
