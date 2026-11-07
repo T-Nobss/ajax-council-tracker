@@ -190,6 +190,20 @@ def main():
         year = int(m.group(1))
         by_year.setdefault(year, (path, text))  # one statement per year
 
+    # Only years fully inside the council terms in terms.csv: a year when the
+    # previous council sat for most of it (e.g. 2018) would have members who
+    # aren't in councillors.csv.
+    with open(DATA / "terms.csv", newline="", encoding="utf-8") as f:
+        starts = [t["start_date"] for t in csv.DictReader(f)]
+    first = min(starts) if starts else "0000-01-01"
+    first_full_year = int(first[:4]) + (0 if first[5:] == "01-01" else 1)
+    skipped = [y for y in by_year if y < first_full_year]
+    for y in skipped:
+        review.append(f"Skipped the {y} statement: {y} is before {first_full_year}, the first full "
+                      f"year of the earliest council term in terms.csv.")
+        review.append("")
+        del by_year[y]
+
     for year, (path, text) in sorted(by_year.items()):
         url = source_link(path) or str(path.relative_to(ROOT))
         lines = text.splitlines()
