@@ -33,15 +33,24 @@ export default function CouncillorList({ terms, councillors }) {
       ? councillors
       : councillors.filter((c) => c.seats.some((s) => s.term_id === term));
 
-  // Within one term, list the mayor and regional councillors first.
+  // Within one term: mayor, then regional councillors, then councillors,
+  // each group in ward order.
+  const seatIn = (c) => c.seats.find((s) => s.term_id === term);
   const rank = (c) => {
-    const role = (c.seats.find((s) => s.term_id === term)?.role ?? "").toLowerCase();
+    const role = (seatIn(c)?.role ?? "").toLowerCase();
     if (role.includes("mayor")) return 0;
     if (role.includes("regional")) return 1;
     return 2;
   };
+  const ward = (c) => seatIn(c)?.ward ?? "";
   const sorted =
-    term === ALL ? shown : [...shown].sort((a, b) => rank(a) - rank(b));
+    term === ALL
+      ? shown
+      : [...shown].sort(
+          (a, b) =>
+            rank(a) - rank(b) ||
+            ward(a).localeCompare(ward(b), undefined, { numeric: true })
+        );
 
   return (
     <>
