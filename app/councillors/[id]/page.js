@@ -6,9 +6,11 @@ import {
   getCouncillorWithSeats,
   getCouncillors,
   getExpenses,
+  getCouncillorPhotos,
   getPayHistory,
 } from "@/lib/data";
 import ExpensesSection from "./ExpensesSection";
+import Avatar from "../../components/Avatar";
 import SalarySection from "./SalarySection";
 
 // One page per row in councillors.csv, built ahead of time.
@@ -29,6 +31,7 @@ export default async function CouncillorPage({ params }) {
   const { id } = await params;
   const c = getCouncillorWithSeats(id);
   if (!c) notFound();
+  const photo = getCouncillorPhotos()[c.id];
   const pay = getPayHistory(c.id);
   const sunshineListed = pay.filter((p) => p.sunshine?.listed);
   const anyUnder = pay.some((p) => p.sunshine && !p.sunshine.listed);
@@ -64,7 +67,26 @@ export default async function CouncillorPage({ params }) {
       <Link href="/councillors" className="crumb">
         ← All councillors
       </Link>
-      <h1>{c.name}</h1>
+      <div className="profile-head">
+        <Avatar id={c.id} name={c.name} size={112} shape="portrait" />
+        <div>
+          <h1>{c.name}</h1>
+          {c.seats[0] && (
+            <p className="profile-role">
+              {[c.seats[0].role, c.seats[0].ward].filter(Boolean).join(" · ")}
+              <span>{c.seats[0].term?.name ?? c.seats[0].term_id} term</span>
+            </p>
+          )}
+          {photo && (
+            <p className="profile-credit">
+              Photo:{" "}
+              <a href={photo.source_url} target="_blank" rel="noopener noreferrer">
+                {photo.credit}
+              </a>
+            </p>
+          )}
+        </div>
+      </div>
 
       <h2>Seats held</h2>
       {c.seats.length === 0 ? (

@@ -251,6 +251,29 @@ numbers show up in the Expenses section of each councillor's profile.
 
 ---
 
+## Design and photos
+
+The look borrows the Town of Ajax's colours (navy `#1c2a56`, gold `#f0a123`,
+red `#ce312b`) and typeface (Poppins), but the site deliberately does **not**
+use the Town's logo or copy its website, and says on every page that it's
+independent. An official-looking site would mislead readers into thinking it's
+run by the Town. If the Town ever gives written permission to use its logo,
+it can be added to the header in `app/layout.js`.
+
+- **Scenic photos** are in `public/photos/` and listed with their licences in
+  `data/photos.csv`. They're freely licensed (CC BY / CC BY-SA) from Wikimedia
+  Commons. The aerial shots are the Town's own, from a video it published
+  under CC BY. Credits are shown on each banner and on the
+  About & photo credits page (`/credits`). Keep the credits if you swap photos.
+- **Councillor photos** are the Town's official portraits from its Meet Your
+  Mayor & Council page, listed in `data/councillor_photos.csv` and credited on
+  each profile. The Town doesn't publish reuse terms, so if it asks for them
+  to be removed, delete the rows (the site falls back to initials). Members
+  without a photo show their initials. To add one, save the image to
+  `public/councillors/<id>.jpg` and add a row to the CSV.
+
+---
+
 ## Updating the live site
 
 The site is hosted on Vercel and connected to this project's GitHub repository.

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Nav from "./components/Nav";
 import "./globals.css";
 
 export const metadata = {
@@ -7,12 +8,13 @@ export const metadata = {
     template: "%s · Ajax Council Tracker",
   },
   description:
-    "Voting records, expenses and budgets for Ajax Town Council, from public records.",
+    "Voting records, pay, expenses and budgets for Ajax Town Council, from public records. An independent project.",
 };
 
 export const viewport = {
   width: "device-width",
   initialScale: 1,
+  themeColor: "#1c2a56",
 };
 
 const nav = [
@@ -24,28 +26,53 @@ const nav = [
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap"
+        />
+      </head>
       <body>
+        <a href="#main" className="skip-link">
+          Skip to main content
+        </a>
         <header className="site-header">
           <div className="container header-inner">
             <Link href="/" className="brand">
-              Ajax Council Tracker
+              <span className="brand-mark" aria-hidden="true" />
+              <span className="brand-text">
+                Ajax Council Tracker
+                <span className="brand-tag">Independent</span>
+              </span>
             </Link>
-            <nav aria-label="Main">
-              <ul className="nav">
-                {nav.map((item) => (
-                  <li key={item.href}>
-                    <Link href={item.href}>{item.label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+            <Nav items={nav} />
           </div>
         </header>
-        <main className="container">{children}</main>
+        <main id="main" className="container">
+          {children}
+        </main>
         <footer className="site-footer">
-          <div className="container">
-            An independent project. All information comes from public records
-            published by the Town of Ajax.
+          <div className="container footer-inner">
+            <div>
+              <p className="footer-brand">Ajax Council Tracker</p>
+              <p>
+                An independent project, not affiliated with or endorsed by the
+                Town of Ajax. All information comes from public records and
+                links to its source.
+              </p>
+            </div>
+            <ul className="footer-links">
+              {nav.map((n) => (
+                <li key={n.href}>
+                  <Link href={n.href}>{n.label}</Link>
+                </li>
+              ))}
+              <li>
+                <Link href="/credits">About &amp; photo credits</Link>
+              </li>
+            </ul>
           </div>
         </footer>
       </body>

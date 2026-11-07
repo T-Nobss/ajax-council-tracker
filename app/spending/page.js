@@ -7,6 +7,7 @@ import {
   getDocuments,
 } from "@/lib/data";
 import BudgetView from "./BudgetView";
+import PageHero from "../components/PageHero";
 
 export const metadata = { title: "Spending" };
 
@@ -77,11 +78,13 @@ export default function BudgetPage() {
 
   return (
     <>
-      <h1>Spending</h1>
-      <p className="lead">
-        What the Town of Ajax planned to spend, what it actually spent, and the
-        documents behind both.
-      </p>
+      <PageHero
+        photo="photos/aerial.jpg"
+        alt="Aerial view of Ajax, with tree-lined streets and the downtown towers"
+        title="Spending"
+        lead="What the Town of Ajax planned to spend, what it actually spent, and the documents behind both."
+        focus="center 38%"
+      />
       {years.length === 0 ? (
         <div className="notice">No budget data has been added yet.</div>
       ) : (

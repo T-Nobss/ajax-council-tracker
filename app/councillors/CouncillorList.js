@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import AvatarView from "../components/AvatarView";
 
 const ALL = "all";
 
@@ -87,13 +88,16 @@ export default function CouncillorList({ terms, councillors }) {
             return (
               <li key={c.id}>
                 <Link href={`/councillors/${c.id}`} className="person">
-                  <strong>{c.name}</strong>
-                  {seats.map((s, i) => (
-                    <span key={i}>
-                      {term === ALL && `${s.term_name}: `}
-                      {seatLabel(s)}
-                    </span>
-                  ))}
+                  <AvatarView photo={c.photo} name={c.name} size={56} />
+                  <span className="person-text">
+                    <strong>{c.name}</strong>
+                    {seats.map((s, i) => (
+                      <span key={i}>
+                        {term === ALL && `${s.term_name}: `}
+                        {seatLabel(s)}
+                      </span>
+                    ))}
+                  </span>
                 </Link>
               </li>
             );
