@@ -4,17 +4,12 @@ const sections = [
   {
     href: "/councillors",
     title: "Councillors",
-    blurb: "Who sits on council, by term and ward.",
+    blurb: "Who sits on council, by term and ward, with each member's pay and expenses.",
   },
   {
     href: "/votes",
     title: "Votes",
     blurb: "Motions brought to council and how each member voted.",
-  },
-  {
-    href: "/expenses",
-    title: "Expenses",
-    blurb: "What each councillor spent, by year and category.",
   },
   {
     href: "/spending",

@@ -5,8 +5,10 @@ import {
   formatMoney,
   getCouncillorWithSeats,
   getCouncillors,
+  getExpenses,
   getSalaryHistory,
 } from "@/lib/data";
+import ExpensesSection from "./ExpensesSection";
 import SalarySection from "./SalarySection";
 
 // One page per row in councillors.csv, built ahead of time.
@@ -47,6 +49,17 @@ export default async function CouncillorPage({ params }) {
     rolesInSalaryYears.some((r) => /regional/i.test(r)) && "a Regional Councillor",
   ].filter(Boolean);
   const sitsOnRegion = regionalRoles.length > 0;
+
+  // Expenses by year, newest first.
+  const expenseYears = Object.values(
+    getExpenses()
+      .filter((e) => e.councillor_id === c.id)
+      .reduce((acc, e) => {
+        const y = (acc[e.year] ??= { year: e.year, source: e.source_url, items: [] });
+        y.items.push({ category: e.category, amount: Number(e.amount) || 0 });
+        return acc;
+      }, {})
+  ).sort((a, b) => b.year.localeCompare(a.year));
 
   return (
     <>
@@ -139,11 +152,10 @@ export default async function CouncillorPage({ params }) {
         />
       )}
 
+      <ExpensesSection name={c.name} years={expenseYears} />
+
       <h2>Votes</h2>
       <div className="notice">Voting records will appear here.</div>
-
-      <h2>Expenses</h2>
-      <div className="notice">Expense records will appear here.</div>
     </>
   );
 }

@@ -641,3 +641,82 @@ h2 {
   font-size: 0.9rem;
   color: var(--muted);
 }
+
+/* Expenses on councillor profiles */
+.expense-years {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.expense-years > li + li {
+  border-top: 1px solid var(--border);
+}
+.expense-years summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  list-style: none;
+}
+.expense-years summary::-webkit-details-marker {
+  display: none;
+}
+.expense-years summary::before {
+  content: "▸";
+  color: var(--muted);
+  margin-right: 6px;
+  transition: transform 0.15s;
+}
+.expense-years details[open] summary::before {
+  transform: rotate(90deg);
+}
+.ey-year {
+  font-weight: 600;
+  margin-right: auto;
+}
+.ey-total {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.expense-years details > :not(summary) {
+  margin-left: 14px;
+  margin-right: 14px;
+}
+.expense-table {
+  width: calc(100% - 28px);
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+.expense-table th,
+.expense-table td {
+  padding: 6px 0;
+  border-top: 1px solid var(--border);
+  text-align: left;
+  font-weight: 400;
+  vertical-align: top;
+}
+.expense-table td.num {
+  text-align: right;
+  white-space: nowrap;
+  padding-left: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.expense-table .ey-sum th,
+.expense-table .ey-sum td {
+  font-weight: 600;
+}
+.ey-sub {
+  margin: 14px 0 4px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.ey-source {
+  margin: 10px 0 14px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}

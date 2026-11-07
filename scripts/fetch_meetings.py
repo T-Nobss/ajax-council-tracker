@@ -11,10 +11,10 @@ GGC meeting in the term it:
   - adds a row to data/meetings.csv  (id, term_id, date, type, minutes_url)
     Rows for other terms already in the file are kept.
   - saves the minutes PDF to sources/minutes/
-  - looks for "Remuneration" in agenda item titles and attachment names. Older
-    meetings have the whole agenda in one PDF; there the PDF's bookmarks (the
-    agenda item titles) are searched and only the matching item's pages are
-    saved. Matches go to sources/expenses/ and data/review/remuneration-found.md
+  - looks for "Remuneration" in agenda item titles and attachment names, and in
+    the bookmarks of the meeting's agenda PDF (which holds the full agenda
+    package: item titles and attachment titles). Only the matching item's
+    pages are saved, not the whole agenda. Matches go to sources/expenses/ and data/review/remuneration-found.md
   - writes data/review/meetings.md with anything that needs checking
 
 Safe to re-run: files already downloaded are skipped, so a re-run only fetches
@@ -318,10 +318,11 @@ def main():
                 found.append({"date": d, "type": mtype, "where": f"Agenda item: {title}",
                               "file": "(no attachment)", "url": page_url, "saved": ""})
 
-        # ---- older meetings: the agenda is one PDF with the items inside it.
-        # Its bookmarks are the agenda item titles, so match those and save
-        # just that item's pages.
-        if agenda and not items:
+        # ---- the agenda PDF: older meetings have only this, and newer ones'
+        # attachments (e.g. a report's tables) are often only complete here.
+        # Its bookmarks are the agenda item and attachment titles, so match
+        # those and save just that item's pages.
+        if agenda:
             url, fname = agenda
             tmp = EXPENSES_DIR / f".agenda-{mid}.pdf"
             try:

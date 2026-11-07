@@ -18,7 +18,6 @@ export const viewport = {
 const nav = [
   { href: "/councillors", label: "Councillors" },
   { href: "/votes", label: "Votes" },
-  { href: "/expenses", label: "Expenses" },
   { href: "/spending", label: "Spending" },
 ];
 
