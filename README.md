@@ -234,6 +234,23 @@ script now and then. It only downloads what's new.
 
 ---
 
+## Updating councillor expenses
+
+Each spring the Town's treasurer reports every member's pay and expenses for
+the year before (the "Statement of Remuneration and Expenses"). It goes to a
+General Government Committee meeting, and `scripts/fetch_meetings.py` saves it
+to `sources/expenses/`. Then run:
+
+```bash
+python3 scripts/extract_expenses.py
+```
+
+This rewrites `data/expenses.csv` from all the statements and checks every
+column against the statement's Total row (`data/review/expenses.md`). The
+numbers show up in the Expenses section of each councillor's profile.
+
+---
+
 ## Updating the live site
 
 The site is hosted on Vercel and connected to this project's GitHub repository.

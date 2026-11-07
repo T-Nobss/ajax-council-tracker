@@ -104,6 +104,12 @@ def table_a(lines):
                 continue
             names[col_of(m.start(), m.end())].append(m.group())
     columns = [re.sub(r"\s*/\s*", "/", " ".join(w)).strip() or f"Column {k + 1}" for k, w in enumerate(names)]
+    # A heading's last words can be printed on a member's row, e.g.
+    # "(net of $6,000" above and "grant)" beside the amount.
+    for k, c in enumerate(columns):
+        if c.count("(") > c.count(")"):
+            tail = re.search(r"\b([a-z]+\))", " ".join(block[first_row:total_i]))
+            columns[k] = c + (" " + tail.group(1) if tail else ")")
 
     def amounts(line):
         # Ignore text like "(net of $6,000 grant)".
