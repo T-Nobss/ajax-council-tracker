@@ -21,7 +21,13 @@ const label = (cat) => {
 // "Elexicon Corporation: Remuneration" -> paid by another body.
 const isOutside = (cat) => cat.includes(":");
 
-export default function ExpensesSection({ name, years }) {
+// Pay itself is shown in the Salary section, not here.
+const isPay = (cat) => cat.startsWith("Remuneration/Benefits");
+
+export default function ExpensesSection({ name, years: allYears }) {
+  const years = allYears
+    .map((y) => ({ ...y, items: y.items.filter((it) => !isPay(it.category)) }))
+    .filter((y) => y.items.length);
   if (!years.length) {
     return (
       <>
@@ -36,17 +42,12 @@ export default function ExpensesSection({ name, years }) {
     <>
       <InfoHeading title="Expenses" label="pay and expenses">
         <p>
-          Every year by March 31, the Town&rsquo;s treasurer must report what
-          each member of Council was paid and spent in the year before (Municipal
-          Act, section 284). These figures come from those reports.
+          <strong>Salary vs. expenses.</strong> Salary (above) is what{" "}
+          {name} is paid for the job. Expenses are everything else the Town
+          paid on top of that: an allowance and the costs of doing the job,
+          such as meetings, training and trips.
         </p>
         <ul className="help-list">
-          <li>
-            <strong>Pay and benefits:</strong> what the Town reports paying
-            this member, including benefits. It won&rsquo;t match the Salary
-            section above, which comes from a different report (the provincial
-            Sunshine List) that counts pay differently.
-          </li>
           <li>
             <strong>Travel allowance:</strong> a fixed allowance set by the
             Town. It&rsquo;s about the same for every councillor; the
@@ -62,6 +63,11 @@ export default function ExpensesSection({ name, years }) {
             Town reports them.
           </li>
         </ul>
+        <p>
+          These come from the same yearly Statement of Remuneration and
+          Expenses as the Town report salary. The Town must publish it by
+          March 31 each year (Municipal Act, section 284).
+        </p>
         {hasOutside && (
           <p>
             <strong>Paid by other organizations</strong> lists money from
@@ -95,7 +101,7 @@ export default function ExpensesSection({ name, years }) {
                       </tr>
                     ))}
                     <tr className="ey-sum">
-                      <th scope="row">Total paid by the Town</th>
+                      <th scope="row">Total expenses paid by the Town</th>
                       <td className="num">{money(total)}</td>
                     </tr>
                   </tbody>

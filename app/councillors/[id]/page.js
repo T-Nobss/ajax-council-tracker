@@ -6,7 +6,7 @@ import {
   getCouncillorWithSeats,
   getCouncillors,
   getExpenses,
-  getSalaryHistory,
+  getPayHistory,
 } from "@/lib/data";
 import ExpensesSection from "./ExpensesSection";
 import SalarySection from "./SalarySection";
@@ -29,26 +29,24 @@ export default async function CouncillorPage({ params }) {
   const { id } = await params;
   const c = getCouncillorWithSeats(id);
   if (!c) notFound();
-  const salaries = getSalaryHistory(c.id);
-  const anyNotListed = salaries.some((s) => !s.listed);
-  const listed = salaries.filter((s) => s.listed);
-  // Durham pay note: based on the roles held during the salary years shown,
-  // not later ones (e.g. someone elected Mayor after serving as a
-  // Regional Councillor).
-  const salaryYears = new Set(salaries.map((s) => s.year));
-  const rolesInSalaryYears = c.seats
+  const pay = getPayHistory(c.id);
+  const sunshineListed = pay.filter((p) => p.sunshine?.listed);
+  const anyUnder = pay.some((p) => p.sunshine && !p.sunshine.listed);
+  const townYears = pay.filter((p) => p.town);
+  // Mayor / Regional Councillor in any year shown: their Region of Durham
+  // pay is handled through the Town (see the harmonization note).
+  const payYears = new Set(pay.map((p) => p.year));
+  const rolesInPayYears = c.seats
     .filter((seat) => {
       if (!seat.term) return false;
       const from = Number(seat.term.start_date.slice(0, 4));
       const to = Number(seat.term.end_date.slice(0, 4));
-      return [...salaryYears].some((y) => y >= from && y <= to);
+      return [...payYears].some((y) => y >= from && y <= to);
     })
     .map((seat) => seat.role);
-  const regionalRoles = [
-    rolesInSalaryYears.some((r) => /mayor/i.test(r)) && "Mayor",
-    rolesInSalaryYears.some((r) => /regional/i.test(r)) && "a Regional Councillor",
-  ].filter(Boolean);
-  const sitsOnRegion = regionalRoles.length > 0;
+  const sitsOnRegion = rolesInPayYears.some((r) => /mayor|regional/i.test(r));
+  const HARMONIZATION_URL =
+    "https://ajax.cityconnections.civicflow.co/p/town-of-ajax/documents/meeting/598?f=0#page=75";
 
   // Expenses by year, newest first.
   const expenseYears = Object.values(
@@ -87,65 +85,96 @@ export default async function CouncillorPage({ params }) {
         </ul>
       )}
 
-      {salaries.length === 0 ? (
+      {pay.length === 0 ? (
         <>
           <h2>Salary</h2>
           <div className="notice">No salary records yet.</div>
         </>
       ) : (
         <SalarySection
-          rows={salaries.map((s) => ({
-            year: s.year,
-            listed: s.listed,
-            salary: s.listed ? formatMoney(s.salary) : "",
-            benefits: s.listed ? formatMoney(s.benefits) : "",
+          rows={pay.map((p) => ({
+            year: p.year,
+            town: p.town ? { amount: formatMoney(p.town.amount), severance: p.town.severance } : null,
+            sunshine: p.sunshine
+              ? {
+                  listed: p.sunshine.listed,
+                  salary: p.sunshine.listed ? formatMoney(p.sunshine.salary) : "",
+                  benefits: p.sunshine.listed ? formatMoney(p.sunshine.benefits) : "",
+                }
+              : null,
           }))}
           notes={
             <>
               <p>
-                Pay from the Town of Ajax, from Ontario&rsquo;s Public Sector
-                Salary Disclosure (the &ldquo;Sunshine List&rdquo;).
+                {c.name}&rsquo;s pay from two public reports. They measure pay
+                differently, so the numbers don&rsquo;t match each other.
               </p>
-              {anyNotListed && (
+              <ul className="help-list">
+                <li>
+                  <strong>Town report:</strong> &ldquo;remuneration and
+                  benefits&rdquo; from the Town&rsquo;s yearly Statement of
+                  Remuneration and Expenses, which covers every member of
+                  Council. It includes the Town&rsquo;s cost of benefits.
+                  {townYears.length > 0 && (
+                    <>
+                      {" "}Reports:{" "}
+                      {townYears.map((p, i) => (
+                        <span key={p.year}>
+                          {i > 0 && ", "}
+                          <a href={p.town.source_url} target="_blank" rel="noopener noreferrer">
+                            {p.year}
+                          </a>
+                        </span>
+                      ))}
+                      .
+                    </>
+                  )}
+                </li>
+                <li>
+                  <strong>Sunshine List:</strong> salary and taxable benefits
+                  as reported to the Province, for people paid $100,000 or
+                  more.
+                  {sunshineListed.length > 0 && (
+                    <>
+                      {" "}Lists:{" "}
+                      {sunshineListed.map((p, i) => (
+                        <span key={p.year}>
+                          {i > 0 && ", "}
+                          <a href={p.sunshine.source_url} target="_blank" rel="noopener noreferrer">
+                            {p.year}
+                          </a>
+                        </span>
+                      ))}
+                      .
+                    </>
+                  )}
+                </li>
+              </ul>
+              {anyUnder && (
                 <p>
-                  <strong>Not listed</strong> means {c.name} was paid less than
-                  $100,000 by the Town of Ajax that year. It doesn&rsquo;t mean
-                  they were paid nothing. The Sunshine List only includes people
-                  paid $100,000 or more.
+                  <strong>Under $100k</strong> means {c.name} isn&rsquo;t on that
+                  year&rsquo;s Sunshine List because the Town paid them less than
+                  $100,000. Their pay is in the Town report column.
                 </p>
               )}
               {sitsOnRegion && (
                 <p>
-                  As {regionalRoles.join(" and as ")}, {c.name} was
-                  also paid separately by the Region of Durham for sitting on
-                  Regional Council. That pay isn&rsquo;t included here.
+                  <strong>Region of Durham pay.</strong> The Mayor and Regional
+                  Councillors are also paid by the Region for sitting on
+                  Regional Council. In{" "}
+                  <a href={HARMONIZATION_URL} target="_blank" rel="noopener noreferrer">
+                    December 2022
+                  </a>{" "}
+                  Council agreed that the Town would pay that too and be paid
+                  back by the Region. The Sunshine List amounts for these roles
+                  rise sharply from 2024, so from then on they likely include
+                  the Region&rsquo;s share. The Town report covers Town pay only.
                 </p>
               )}
               <p>
-                Each year&rsquo;s list is published the following spring.
-                Source:{" "}
-                {listed.length > 0 ? (
-                  <>
-                    Sunshine List{" "}
-                    {listed.map((s, i) => (
-                      <span key={s.year}>
-                        {i > 0 && ", "}
-                        <a href={s.source_url} target="_blank" rel="noopener noreferrer">
-                          {s.year}
-                        </a>
-                      </span>
-                    ))}
-                  </>
-                ) : (
-                  <a
-                    href="https://www.ontario.ca/page/public-sector-salary-disclosure"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Sunshine List
-                  </a>
-                )}
-                .
+                A dash (&mdash;) means that report wasn&rsquo;t collected for
+                that year. Each year&rsquo;s reports come out the following
+                spring. Expenses and allowances are shown separately below.
               </p>
             </>
           }

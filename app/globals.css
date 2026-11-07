@@ -720,3 +720,21 @@ h2 {
   font-size: 0.85rem;
   color: var(--muted);
 }
+
+/* Salary table: two sources side by side */
+.pay-table td.num {
+  vertical-align: top;
+}
+.pay-sub {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.pay-none {
+  color: var(--muted);
+}
+.pay-table .not-listed {
+  font-style: italic;
+  color: var(--muted);
+  white-space: nowrap;
+}
