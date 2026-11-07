@@ -27,7 +27,7 @@ budget and the total, which are used as the checks.
 import re
 import subprocess
 import sys
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -135,6 +135,63 @@ def page_title(text):
     return None
 
 
+def line_items(text):
+    """{("E"|"R", label): budget-year amount} for one budget-by-driver page."""
+    items = Counter()
+    section = None
+    for line in text.splitlines():
+        if "OPERATING EXPENDITURES" in line:
+            section = "E"
+        elif "OPERATING REVENUES" in line:
+            section = "R"
+        m = re.match(r"\s+([A-Z][A-Za-z0-9$&/,() .'-]+?)\s{2,}(" + NUM + r")\s", line)
+        if m and section and not m.group(1).startswith(("Total", "NET")):
+            label = m.group(1).strip().replace("Slots", "Casino Ajax")  # renamed in 2024
+            items[(section, label)] += numbers_after(line, m.group(1))[1]
+    return items
+
+
+def reconcile(year, gap_e, gap_r, town, dept, lib_items, lib, tp):
+    """
+    Explain why departments add up to more than the town-wide page.
+    The town-wide page (1) counts the Library as one grant of its net cost,
+    so the Library's revenue drops out of both sides; (2) also lists the
+    Library's debt payment and the reserve money that pays it on their own;
+    (3) has some costs, matched by recoveries, that aren't on any department
+    page. Returns the breakdown if it accounts for the gap (within $100 of
+    rounding), else None.
+    """
+    if not lib:
+        return None
+    lib_page, _, lib_rev = lib
+    repeated = {}
+    for k in (("E", "Debenture"), ("R", "Reserve Allocations")):
+        if lib_items.get(k) and abs((town[k] - dept[k]) - lib_items[k]) < 0.5:
+            repeated[k] = lib_items[k]
+    other = {}
+    for k in set(town) | set(dept):
+        if k in repeated or k[1] in ("Taxation Revenue", "Municipal Grants & Subsidies"):
+            continue
+        d = town[k] - dept[k]
+        if abs(d) > 0.5:
+            other[k] = d
+    rep_e = sum(v for k, v in repeated.items() if k[0] == "E")
+    rep_r = sum(v for k, v in repeated.items() if k[0] == "R")
+    oth_e = sum(v for k, v in other.items() if k[0] == "E")
+    oth_r = sum(v for k, v in other.items() if k[0] == "R")
+    exp_e = lib_rev - rep_e - oth_e
+    exp_r = lib_rev - rep_r - oth_r
+    if abs(exp_e - gap_e) > 100.5 or abs(exp_r - gap_r) > 100.5:
+        print(f"  [{year}] reconcile failed: explained {exp_e:,.0f}/{exp_r:,.0f} vs gap {gap_e:,.0f}/{gap_r:,.0f}; other={other}", file=sys.stderr)
+        return None
+    return {
+        "lib_page": lib_page, "town_page": tp, "lib_rev": lib_rev,
+        "repeated": rep_e, "other_e": oth_e, "other_r": oth_r,
+        "other_lines": sorted(((k[1], v) for k, v in other.items() if k[0] == "E"), key=lambda x: -x[1]),
+        "gap_e": gap_e, "gap_r": gap_r,
+    }
+
+
 def operating(year, rel, review):
     pdf = SRC / Path(rel).name
     url = f"{SITE}/{rel}"
@@ -143,6 +200,8 @@ def operating(year, rel, review):
     depts = OrderedDict()  # dept -> dict(gross, revenue, net, pages, parts)
     summary = None  # (page_no, {dept: net}, total)
     townwide = None  # (page_no, gross, revenue)
+    town_items, dept_items, lib_items = Counter(), Counter(), Counter()
+    lib = None  # (page, gross, revenue)
 
     for i, t in enumerate(text, start=1):
         if "BUDGET BY DRIVER" not in t:
@@ -177,6 +236,7 @@ def operating(year, rel, review):
             g = find_line(t, "Total Operating Expenditures")
             r = find_line(t, "Total Revenues / Recoveries")
             tax = find_line(t, "Taxation Revenue")
+            town_items.update(line_items(t))
             if g and r:
                 townwide = (
                     i,
@@ -208,6 +268,12 @@ def operating(year, rel, review):
                 f"{year} {title} (page {i}): expenditures {fmt(gross)} − revenue {fmt(rev)} "
                 f"= {fmt(gross - rev)}, but the page says net {fmt(net)}."
             )
+
+        if title == "LIBRARY SERVICES":
+            lib_items.update(line_items(t))
+            lib = (i, gross, rev)
+        else:
+            dept_items.update(line_items(t))
 
         dept = DEPT_ALIASES.get(DIVISION_TO_DEPT.get(title, title), DIVISION_TO_DEPT.get(title, title))
         d = depts.setdefault(dept, {"gross": 0, "revenue": 0, "net": 0, "pages": [], "parts": []})
@@ -272,21 +338,29 @@ def operating(year, rel, review):
             review["mismatch"].append(f"{year}: department net budgets add up to {fmt(sum_net)}, book total is {fmt(total)}.")
     if townwide:
         tp, tg, tr, ttax = townwide
-        ok = abs(sum_gross - tg) < 0.5
-        checks.append(
-            f"{'✅' if ok else '❌'} Gross expenditures: departments add up to {fmt(sum_gross)}; "
-            f"the book's total (page {tp}) is {fmt(tg)}."
-        )
-        if not ok:
-            review["mismatch"].append(f"{year}: department gross expenditures add up to {fmt(sum_gross)}, book total is {fmt(tg)} (page {tp}).")
-        ok = abs(sum_rev - (tr - ttax)) < 0.5
-        checks.append(
-            f"{'✅' if ok else '❌'} Revenue (not counting property tax): departments add up to "
-            f"{fmt(sum_rev)}; the book's total revenue {fmt(tr)} minus taxation {fmt(ttax)} "
-            f"is {fmt(tr - ttax)} (page {tp})."
-        )
-        if not ok:
-            review["mismatch"].append(f"{year}: department revenues add up to {fmt(sum_rev)}, book's non-tax revenue is {fmt(tr - ttax)} (page {tp}).")
+        gap_e = sum_gross - tg
+        gap_r = sum_rev - (tr - ttax)
+        rec = reconcile(year, gap_e, gap_r, town_items, dept_items, lib_items, lib, tp)
+        for label, gap, ours, theirs in (
+            ("Gross expenditures", gap_e, sum_gross, f"the book's total (page {tp}) is {fmt(tg)}"),
+            ("Revenue (not counting property tax)", gap_r, sum_rev,
+             f"the book's total revenue {fmt(tr)} minus taxation {fmt(ttax)} is {fmt(tr - ttax)} (page {tp})"),
+        ):
+            if abs(gap) < 0.5:
+                checks.append(f"✅ {label}: departments add up to {fmt(ours)}; {theirs}.")
+            elif rec:
+                checks.append(
+                    f"☑️ {label}: departments add up to {fmt(ours)}; {theirs}. "
+                    f"The {fmt(gap)} difference is fully explained (see below)."
+                )
+            else:
+                checks.append(f"❌ {label}: departments add up to {fmt(ours)}; {theirs}.")
+                review["mismatch"].append(
+                    f"{year}: {label.lower()} from departments differ from the town-wide page by "
+                    f"{fmt(gap)} (page {tp}), and the usual explanation doesn't account for it."
+                )
+        if rec:
+            review["reconcile"][year] = rec
     else:
         review["unclear"].append(f"{year}: couldn't find the town-wide totals page to check gross and revenue.")
 
@@ -533,7 +607,8 @@ def bullets(items, empty="None."):
 
 def main():
     review = {"mismatch": [], "unclear": [], "checks": OrderedDict(), "notes": [],
-              "programs": OrderedDict(), "inferred": OrderedDict(), "no_dept": OrderedDict()}
+              "programs": OrderedDict(), "inferred": OrderedDict(), "no_dept": OrderedDict(),
+              "reconcile": OrderedDict()}
 
     budget_rows = []
     for year in sorted(OPERATING):
@@ -569,19 +644,59 @@ def main():
         out += [f"- {c}" for c in checks] or ["- (no checks ran)"]
         out.append("")
 
-    out += ["## Mismatches", ""]
-    gap = [m for m in review["mismatch"] if re.match(r"\d{4}: department (gross|revenues)", m)]
-    other = [m for m in review["mismatch"] if m not in gap]
-    if gap:
+    if review["reconcile"]:
+        R = review["reconcile"]
+        ys = list(R)
+
+        def row(label, f):
+            return f"| {label} | " + " | ".join(f(R[y]) for y in ys) + " |"
+
         out += [
-            "**Gross expenditure and revenue vs. the town-wide page.** In every year the "
-            "department pages add up to slightly more than the town-wide summary page, by "
-            "the *same* amount on both the expenditure and revenue side, so net budgets are "
-            "unaffected and match exactly. Every page carries the footnote \"Some amounts may "
-            "differ from Budget Analysis due to presentation, budget neutral transfers between "
-            "departments or rounding\". The cause isn't stated in the books (it isn't simply "
-            "the Library, which the town-wide page shows as one grant line). `budget.csv` uses "
-            "the department pages.", "", bullets(gap), ""]
+            "## Why department totals don't match the town-wide page", "",
+            "> **Note:** Adding up the departments gives slightly higher spending and revenue "
+            "than the Town's own town-wide totals page. The gap is the same on both sides, so "
+            "the amount paid by property tax (net budget) is not affected. It comes from how "
+            "the town-wide page presents the Library and a few shared costs, not from missing "
+            "or wrong numbers.", "",
+            "Three things cause it, and together they account for the whole gap every year:", "",
+            "1. **The Library is counted as one grant.** Department figures include the "
+            "Library's full spending and its own revenue (fines, room bookings, grants, etc.). "
+            "The town-wide page instead shows the Library as a single grant equal to its net "
+            "cost, so the Library's revenue drops out of *both* spending and revenue.",
+            "2. **The Library's debt payment is also listed separately.** The town-wide page also shows "
+            "the Library's debenture (loan) payment, and the reserve money that pays for it, as "
+            "separate lines, even though both are already inside the Library grant. This adds "
+            "the same amount back to both sides.",
+            "3. **A few costs only appear on the town-wide page.** Some utilities, contracted "
+            "services and similar costs are on the town-wide page but not on any department "
+            "page, and are matched by the same amount of recoveries (money paid back to the "
+            "Town). The books don't say what they are for. The Library page has no utilities "
+            "line, so they may be building costs the Town pays for the Library and recovers.",
+            "",
+            "| | " + " | ".join(str(y) for y in ys) + " |",
+            "|---|" + "---:|" * len(ys),
+            row("1. Library revenue left out of town-wide totals", lambda r: fmt(r["lib_rev"])),
+            row("2. Library debt payment listed separately", lambda r: fmt(-r["repeated"])),
+            row("3. Town-wide-only costs (matched by recoveries)", lambda r: fmt(-r["other_e"])),
+            row("**Gap: spending**", lambda r: f"**{fmt(r['gap_e'])}**"),
+            row("**Gap: revenue**", lambda r: f"**{fmt(r['gap_r'])}**"),
+            "",
+            *([
+                "Where the spending and revenue gaps differ slightly, it's because the "
+                "town-wide-only costs and their recoveries differ by that amount ("
+                + ", ".join(f"{y}: costs {fmt(R[y]['other_e'])}, recoveries {fmt(R[y]['other_r'])}"
+                            for y in ys if abs(R[y]['other_e'] - R[y]['other_r']) > 0.5)
+                + "), which looks like rounding.", ""]
+              if any(abs(R[y]['other_e'] - R[y]['other_r']) > 0.5 for y in ys) else []),
+            "Item 3 by type of cost: " + "; ".join(
+                f"{y}: " + ", ".join(f"{lab} {fmt(v)}" for lab, v in R[y]["other_lines"]) for y in ys
+            ) + ".", "",
+            "Pages used: town-wide totals " + ", ".join(f"{y} p.{R[y]['town_page']}" for y in ys)
+            + "; Library " + ", ".join(f"{y} p.{R[y]['lib_page']}" for y in ys) + ".", "",
+        ]
+
+    out += ["## Mismatches", ""]
+    other = review["mismatch"]
     out += [bullets(other, "No other mismatches."), ""]
 
     out += ["## Unclear values", "", bullets(review["unclear"]), ""]
