@@ -173,3 +173,79 @@ h2 {
   font-size: 14px;
   padding: 20px 0;
 }
+
+/* Term filter */
+.filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-bottom: 20px;
+}
+.filter label {
+  font-weight: 600;
+}
+.filter select {
+  font: inherit;
+  font-size: 16px; /* stops iOS zooming in */
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  max-width: 100%;
+}
+
+/* Councillor list */
+.people,
+.seats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.person {
+  display: block;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+.person:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+.person strong {
+  display: block;
+  color: var(--accent);
+  font-size: 1.05rem;
+}
+.person span,
+.seats span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* Profile */
+.crumb {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-size: 15px;
+  text-decoration: none;
+}
+.seats li {
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.seats strong {
+  display: block;
+}
+.seats .dates {
+  font-size: 0.875rem;
+}

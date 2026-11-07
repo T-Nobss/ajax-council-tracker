@@ -36,11 +36,15 @@ or any text editor.
 ### How the files connect: IDs
 
 Each record gets a short **ID** so other files can point to it. For example,
-give each councillor an ID like `c-smith` in `councillors.csv`. Then everywhere
+give each councillor an ID like `jane-smith` in `councillors.csv`. Then everywhere
 else that councillor appears (seats, votes, expenses, mover, seconder) you use
-`c-smith` rather than typing their name again.
+`jane-smith` rather than typing their name again.
 
 That way, a name only needs to be spelled correctly in one place.
+
+A councillor's ID is also their page address on the site: `jane-smith` becomes
+`/councillors/jane-smith`. So use lowercase letters, numbers and hyphens only,
+and keep it the same forever so links people share keep working.
 
 A small example:
 
@@ -53,13 +57,13 @@ id,name,start_date,end_date
 **councillors.csv**
 ```
 id,name
-c-smith,Jane Smith
+jane-smith,Jane Smith
 ```
 
 **seats.csv**
 ```
 councillor_id,term_id,role,ward
-c-smith,2022-2026,Regional & Local Councillor,Ward 1
+jane-smith,2022-2026,Regional & Local Councillor,Ward 1
 ```
 
 **meetings.csv**
@@ -71,19 +75,19 @@ m-2024-03-18,2022-2026,2024-03-18,Council,https://example.com/minutes.pdf
 **motions.csv**
 ```
 id,meeting_id,item,text,mover,seconder,result,recorded_vote
-mo-001,m-2024-03-18,8.1,"Approve the 2024 parks plan, as amended",c-smith,c-jones,Carried,yes
+mo-001,m-2024-03-18,8.1,"Approve the 2024 parks plan, as amended",jane-smith,john-jones,Carried,yes
 ```
 
 **votes.csv**
 ```
 motion_id,councillor_id,vote
-mo-001,c-smith,Yes
+mo-001,jane-smith,Yes
 ```
 
 **expenses.csv**
 ```
 councillor_id,year,category,amount,source_url
-c-smith,2024,Mileage,1250.40,https://example.com/expenses-2024.pdf
+jane-smith,2024,Mileage,1250.40,https://example.com/expenses-2024.pdf
 ```
 
 ### Tips
