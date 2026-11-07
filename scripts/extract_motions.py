@@ -42,7 +42,10 @@ RESULT = re.compile(
     r"^(?:MOTION\s+)?(CARRIED|DEFEATED|LOST|WITHDRAWN|DEFERRED|TABLED|REFERRED|FAILED)\b[A-Za-z0-9/ ,.()'-]*$")
 # Labels written just above a motion: "Main Motion", "Amendment", ...
 KIND = re.compile(r"^(Main Motion(?: as Amended)?|Amendment(?: to the Amendment)?|Amended Motion|Referral Motion|"
-                  r"Deferral Motion|Motion to Refer|Motion to Defer|Motion to Table|Substantive Motion)$", re.I)
+                  r"Deferral Motion|Motion to Refer|Motion to Defer|Motion to Table|Substantive Motion|"
+                  r"Motion \d+|Motion to Amend|Motion as Amended|Amended Main Motion)$", re.I)
+# Labels that mean the motion before was replaced before a vote on it.
+SUPERSEDES = re.compile(r"amend|refer|defer|table|motion \d", re.I)
 MOVED = re.compile(r"^Moved\s*by\s*:?\s*(.*)$", re.I)
 SECONDED = re.compile(r"^Seconded\s*by\s*:?\s*(.*)$", re.I)
 VOTE_LABEL = re.compile(r"^(In\s*Fav\s*ou?r|Opposed|Absent|Abstain(?:ed)?|Declared\s+(?:a\s+)?Conflict)\s*:?\s*(.*)$", re.I)
@@ -55,8 +58,38 @@ NOISE = re.compile(
 
 
 def squash(s):
-    """Lower-case, letters only: 'Counci llor  Dies ,' -> 'councillordies'."""
-    return re.sub(r"[^a-z]", "", s.lower())
+    """Lower-case, letters only: 'Counci llor  Dies ,' -> 'councillordies'.
+    Common misspellings in the minutes ('Counicllor', 'Councilor',
+    'Cuncillor') are read as 'councillor'."""
+    s = re.sub(r"[^a-z]", "", s.lower())
+    return re.sub(r"c[ou]{0,2}n[ic]{1,3}l{1,2}or", "councillor", s)
+
+
+TITLE_WORDS = {"mayor", "deputy", "regional", "reg", "councillor", "councilor", "counicllor",
+               "cuncillor", "counci", "llor", "ional", "and"}
+
+
+def name_like(line):
+    """True if a line looks like (more of) a list of names, not narrative."""
+    if re.search(r"\d|resumed|recessed|chair|meeting|motion|vote", line, re.I):
+        return False
+    for chunk in line.split(","):
+        words = chunk.replace(".", " ").split()
+        if len(words) > 5:
+            return False
+        if any(w[0].islower() and w.lower() not in TITLE_WORDS for w in words):
+            return False
+    return bool(line.strip())
+
+
+def continues(prev, line):
+    """Should `line` be joined to the names list ending with `prev`?"""
+    if not name_like(line):
+        return False
+    tail = prev.rstrip()
+    return (tail.endswith(",") or tail.split()[-1].lower().strip(",") in TITLE_WORDS
+            or re.match(r"^(Mayor|Deputy|Regional|Reg|Councillor|Counci)", line) is not None
+            or len(tail.split(",")[-1].split()) <= 2)
 
 
 def load_people():
@@ -88,9 +121,17 @@ def split_names(text):
     return [n.strip(" .;") for n in text.split(",") if n.strip(" .;")]
 
 
+OCR_TEXT = ROOT / "sources" / "minutes-text"
+
+
 def read_lines(pdf):
+    """Text lines of a minutes PDF. Scanned minutes have no text layer, so
+    their OCR text from sources/minutes-text/ (scripts/ocr_minutes.sh) is used."""
     text = subprocess.run(["pdftotext", "-layout", str(pdf), "-"],
                           capture_output=True, text=True).stdout
+    if len(re.sub(r"\s", "", text)) < 200:
+        ocr = OCR_TEXT / f"{pdf.stem}.txt"
+        text = ocr.read_text() if ocr.exists() else ""
     text = text.replace("ﬁ", "fi").replace("ﬂ", "fl").replace("’", "'")
     lines = []
     for raw in text.splitlines():
@@ -133,10 +174,15 @@ def parse_meeting(meeting_id, when, people, review, is_council):
             i += 1
         body, result, groups, current = [], "", {}, None
         recorded = False
+        next_kind = ""
         while i < len(lines):
             s = lines[i]
             if MOVED.match(s):
                 break  # next motion starts: this one had no result line
+            if KIND.match(s):
+                next_kind = s.title()  # label for the motion that follows
+                i += 1
+                continue
             if RESULT.match(s) and s.split()[0].isupper():
                 result = s
                 i += 1
@@ -152,8 +198,7 @@ def parse_meeting(meeting_id, when, people, review, is_council):
                             current = "in favour" if label.startswith("infav") else label
                             groups.setdefault(current, []).append(v.group(2))
                             recorded = True
-                        elif current and (re.match(r"^(Mayor|Regional|Reg|Councillor|Counci)", t)
-                                          or groups[current][-1].rstrip().endswith(",")):
+                        elif current and continues(groups[current][-1], t):
                             groups[current].append(t)
                         else:
                             break
@@ -169,8 +214,7 @@ def parse_meeting(meeting_id, when, people, review, is_council):
                 current = label
                 groups.setdefault(current, []).append(v.group(2))
                 recorded = True
-            elif current and (s.endswith(",") or re.match(r"^(Mayor|Regional|Councillor|Reg)", s)
-                              or (groups[current] and groups[current][-1].rstrip().endswith(","))):
+            elif current and groups[current] and continues(groups[current][-1], s):
                 groups[current].append(s)  # wrapped list of names
             else:
                 current = None
@@ -191,14 +235,21 @@ def parse_meeting(meeting_id, when, people, review, is_council):
             review["unmatched"].append(f"{mid} ({item[:60]}): seconder '{seconder_raw}' didn't match a member")
         if not seconder_raw and is_council and "no seconder" not in result.lower():
             review["unclear"].append(f"{mid} ({item[:60]}): Council motion with no seconder")
-        if not result:
+        if not result and next_kind and SUPERSEDES.search(next_kind):
+            result = f"(not voted on directly: followed by {next_kind.lower()})"
+            review["superseded"].append(f"{mid} ({item[:60]}): followed by {next_kind}")
+        elif not result:
             review["unclear"].append(f"{mid} ({item[:60]}): no result line found before the next motion or the end")
+        kind = next_kind
 
-        named = {}
+        named, conflicted = {}, set()
         if groups.get("in favour") is not None or groups.get("opposed") is not None:
             for label, vote in (("in favour", "Yes"), ("opposed", "No"), ("absent", "Absent"),
                                 ("abstain", "Abstain"), ("abstained", "Abstain")):
-                for name in split_names(" ".join(groups.get(label, []))):
+                listed = " ".join(groups.get(label, []))
+                if re.match(r"^\s*(none|nil)\b", listed, re.I):
+                    listed = ""
+                for name in split_names(listed):
                     if squash(name) in ("none", "nil", ""):
                         continue
                     cid = match(name, people, when)
@@ -206,8 +257,13 @@ def parse_meeting(meeting_id, when, people, review, is_council):
                         review["unmatched"].append(f"{mid}: '{name}' in {label} didn't match a member")
                         continue
                     if cid in named and named[cid] != vote:
-                        review["failed"].append(f"{mid}: {cid} is listed as both {named[cid]} and {vote}")
+                        review["failed"].append(
+                            f"{mid}: the minutes list {cid} as both {named[cid]} and {vote}; "
+                            f"no vote recorded for them on this motion")
+                        conflicted.add(cid)
                     named[cid] = vote
+            for cid in conflicted:
+                named.pop(cid, None)
             yes = sum(v == "Yes" for v in named.values())
             no = sum(v == "No" for v in named.values())
             if yes + no > COUNCIL_SIZE:
@@ -242,7 +298,7 @@ def main():
         meetings = {m["id"]: m for m in csv.DictReader(f)}
     wanted = sys.argv[1:] or sorted(p.stem for p in MINUTES.glob("*.pdf"))
     people = load_people()
-    review = {"failed": [], "unmatched": [], "unclear": []}
+    review = {"failed": [], "unmatched": [], "unclear": [], "superseded": [], "ocr": []}
     all_m, all_v, done = [], [], []
     for mid in wanted:
         if mid not in meetings or not (MINUTES / f"{mid}.pdf").exists():
@@ -250,6 +306,8 @@ def main():
             continue
         m, v = parse_meeting(mid, meetings[mid]["date"], people, review,
                              is_council="Council" in meetings[mid]["type"])
+        if (OCR_TEXT / f"{mid}.txt").exists() and m:
+            review["ocr"].append(f"{mid}: {len(m)} motions, {sum(r['recorded_vote'] == 'yes' for r in m)} recorded votes")
         if not m:
             review["unclear"].append(f"{mid}: no motions found in the minutes")
         all_m += m
@@ -274,7 +332,10 @@ def main():
            f"{COUNCIL_SIZE}; nobody can be on both sides; a CARRIED result should have more "
            "in favour than opposed.", ""]
     for title, key in (("Failed checks", "failed"), ("Names that didn't match", "unmatched"),
-                       ("Unclear", "unclear")):
+                       ("Unclear", "unclear"),
+                       ("Moved but not voted on directly (replaced by an amendment, referral or split; "
+                        "the vote that followed is recorded as its own motion)", "superseded"),
+                       ("From scanned minutes (read with OCR; spot-check these)", "ocr")):
         out += [f"## {title}", "", *([f"- {x}" for x in review[key]] or ["None."]), ""]
     (DATA / "review" / "votes.md").write_text("\n".join(out))
     print("\n".join(out))

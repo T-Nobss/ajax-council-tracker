@@ -9,3 +9,6 @@ __pycache__/
 
 # Temporary agenda downloads made by scripts/fetch_meetings.py
 sources/expenses/.agenda-*
+
+# OCR output still being written by scripts/ocr_minutes.sh
+sources/minutes-text/*.part
