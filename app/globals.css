@@ -249,3 +249,60 @@ h2 {
 .seats .dates {
   font-size: 0.875rem;
 }
+
+/* Data tables */
+.section-intro {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+.data-table th,
+.data-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.data-table tbody tr:last-child th,
+.data-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.data-table thead th {
+  background: var(--surface);
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+.data-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.data-table .not-listed {
+  color: var(--muted);
+  font-style: italic;
+}
+.footnote {
+  margin-top: 12px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.footnote p {
+  margin: 0 0 8px;
+}
+@media (max-width: 480px) {
+  .data-table th,
+  .data-table td {
+    padding: 8px 10px;
+    font-size: 0.875rem;
+  }
+}
