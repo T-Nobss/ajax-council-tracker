@@ -1581,3 +1581,41 @@ h2 {
 .mv-meta .proc-tag {
   margin: 0 0 0 4px;
 }
+
+/* Campaign donors on councillor profiles */
+.heading-row h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+.expense-years details > .heading-row,
+.expense-years details > h3 {
+  margin-top: 18px;
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+.donor-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 0.92rem;
+}
+.donor-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-top: 1px solid var(--border);
+}
+.donor-list .num {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.donor-town {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.expense-years details > .show-more-row {
+  margin-bottom: 8px;
+}

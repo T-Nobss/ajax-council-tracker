@@ -44,7 +44,7 @@ The three crossed-out amounts ($130) match the form's "contributions of $100 or
 less" line exactly, so they were moved out of the list and into that line.
 Total contributions also check: $300 (candidate, goods) + $130 + $22,350 = $22,780 (line 1A).
 
-### ⚠ Rules 2 and 3 conflict for this filing — needs your decision
+### Rules 2 and 3 conflict for this filing (decided: keep rule 3)
 
 Line 1B ($22,350) still includes **six contributions of exactly $100**
 (total $600), from the list on pp. 15 and 17. They are "not over $100", so under
@@ -63,8 +63,9 @@ So `donations.csv` adds to **$21,750.00**, which is line 1B minus $600.
 (Strictly, the form's line 1B is for contributions *exceeding* $100, so the
 candidate appears to have put these $100 donations on the wrong line.)
 
-Options: (a) keep as is (rule 3) and explain the $600 gap on the site; or
-(b) add the six donors so the rows match 1B (rule 2). Currently (a).
+**Decision (owner, 2026-11-08):** keep rule 3. The six $100 donors aren't
+listed, and the $600 gap is explained in `donations_note`. That note appears behind
+the "i" next to "Donors over $100" on Sterling Lee's profile.
 
 ### Flags
 

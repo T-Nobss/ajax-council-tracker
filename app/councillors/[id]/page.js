@@ -8,12 +8,14 @@ import {
   getExpenses,
   getCouncillorPhotos,
   getPayHistory,
+  getCampaigns,
 } from "@/lib/data";
 import ExpensesSection from "./ExpensesSection";
 import VotesSection from "./VotesSection";
 import { WARD_CHANGE_SOURCE } from "../../components/WardChangeNote";
 import Avatar from "../../components/Avatar";
 import SalarySection from "./SalarySection";
+import CampaignSection from "./CampaignSection";
 
 // One page per row in councillors.csv, built ahead of time.
 // The address uses the councillor's id, e.g. /councillors/jane-smith
@@ -215,6 +217,8 @@ export default async function CouncillorPage({ params }) {
       )}
 
       <ExpensesSection name={c.name} years={expenseYears} />
+
+      <CampaignSection name={c.name} campaigns={getCampaigns(c.id)} />
 
       <VotesSection id={c.id} name={c.name} />
     </>
