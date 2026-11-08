@@ -6,6 +6,10 @@ Council (Ontario), built from public records.
 There is no database. **Everything the site shows comes from the spreadsheet
 files in the `data` folder.** To update the site, you edit those files.
 
+**Building one for your own municipality, or picking this project up?** See
+[docs/REPLICATION-GUIDE.md](docs/REPLICATION-GUIDE.md): the full step-by-step
+process, data sources, checks, technical problems and fixes, and limitations.
+
 ---
 
 ## How the data folder works
