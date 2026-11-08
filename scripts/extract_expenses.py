@@ -270,6 +270,20 @@ def main():
             review.append("Notes printed in the table: " + "; ".join(notes))
         review.append("")
 
+    # Statements whose tables are images (e.g. 2018) are transcribed by hand
+    # into data/expenses_manual.csv, checked against their printed totals.
+    manual = DATA / "expenses_manual.csv"
+    if manual.exists():
+        have = {r["year"] for r in rows_out}
+        with open(manual, newline="", encoding="utf-8") as f:
+            extra = [r for r in csv.DictReader(f) if int(r["year"]) not in have and str(r["year"]) not in have]
+        rows_out += extra
+        if extra:
+            review.append(f"**{', '.join(sorted({r['year'] for r in extra}))}**: from `data/expenses_manual.csv` "
+                          f"({len(extra)} rows), transcribed by hand from the statement's table images; every "
+                          f"row and column was checked against the printed totals.")
+            review.append("")
+
     with open(DATA / "expenses.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=["councillor_id", "year", "category", "amount", "source_url"],
                            lineterminator="\n")

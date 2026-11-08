@@ -1,4 +1,6 @@
 councillor_id,year,salary,taxable_benefits,source_url
+steve-parish,2016,107518.36,8060.54,https://data.ontario.ca/dataset/public-sector-salary-disclosure-2016
+steve-parish,2017,102700.00,8457.12,https://data.ontario.ca/dataset/public-sector-salary-disclosure-2017
 shaun-collier,2019,128060.00,11882.28,https://data.ontario.ca/dataset/public-sector-salary-disclosure-2019
 shaun-collier,2020,115012.00,26986.44,https://data.ontario.ca/dataset/public-sector-salary-disclosure-2020
 shaun-collier,2021,115012.00,26996.88,https://www.ontario.ca/public-sector-salary-disclosure/2021/all-sectors-and-seconded-employees/

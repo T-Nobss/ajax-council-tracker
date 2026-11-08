@@ -56,7 +56,11 @@ export default function SalarySection({ rows, notes }) {
                   {r.town ? (
                     <>
                       {r.town.amount}
-                      {r.town.severance && <span className="pay-sub">incl. severance</span>}
+                      {r.town.severance && (
+                        <span className="pay-sub">
+                          {r.town.severance === "maybe" ? "may incl. severance" : "incl. severance"}
+                        </span>
+                      )}
                     </>
                   ) : (
                     <span className="pay-none">—</span>
