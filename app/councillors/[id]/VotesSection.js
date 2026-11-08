@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getVotingRecord } from "@/lib/data";
 import InfoHeading from "../../components/InfoHeading";
+import ShowMore from "../../components/ShowMore";
 import { Outcome } from "../../votes/VotesView";
 
 function shortDate(iso) {
@@ -78,7 +79,7 @@ export default function VotesSection({ id, name }) {
       {split.length > 0 && (
         <>
           <h3 className="sub-heading">Split votes</h3>
-          <ul className="member-votes">
+          <ShowMore className="member-votes" initial={5} step={10} label="split votes">
             {split.map((m) => {
               const vote = m.yes.includes(id) ? "For" : "Against";
               return (
@@ -94,7 +95,7 @@ export default function VotesSection({ id, name }) {
                 </li>
               );
             })}
-          </ul>
+          </ShowMore>
         </>
       )}
     </>

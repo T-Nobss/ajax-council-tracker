@@ -1398,3 +1398,11 @@ h2 {
 .mv-meta .outcome {
   margin-left: 4px;
 }
+.show-more-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.show-less {
+  color: var(--muted);
+}
