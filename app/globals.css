@@ -1560,3 +1560,24 @@ h2 {
     display: none;
   }
 }
+.tally-out {
+  grid-column: 2;
+  color: var(--muted);
+}
+.tally-out strong {
+  color: var(--muted);
+}
+.proc-tag {
+  display: inline-block;
+  margin: 0 0 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  border: 1px dashed var(--border);
+}
+.mv-meta .proc-tag {
+  margin: 0 0 0 4px;
+}

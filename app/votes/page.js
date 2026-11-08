@@ -26,6 +26,9 @@ export default function VotesPage() {
       no: m.no.map(short),
       yesIds: m.yes,
       noIds: m.no,
+      procedural: m.procedural,
+      absent: m.absent.map((a) => short(a.id) + (a.note ? ` (${a.note})` : "")),
+      notVoting: m.notVoting.map((a) => short(a.id) + (a.note ? ` (${a.note})` : "")),
     }))
     .sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
 

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getVotingRecord } from "@/lib/data";
 import InfoHeading from "../../components/InfoHeading";
 import ShowMore from "../../components/ShowMore";
-import { Outcome } from "../../votes/VotesView";
+import { Outcome, ProceduralTag } from "../../votes/VotesView";
 
 function shortDate(iso) {
   const [y, m, d] = iso.split("-").map(Number);
@@ -89,7 +89,7 @@ export default function VotesSection({ id, name }) {
                     <Link href={`/votes/${m.meeting_id}#${m.id}`}>{m.item || "Motion"}</Link>
                     <span className="mv-meta">
                       {shortDate(m.meeting.date)} · {m.meeting.type} · {m.yes.length}–{m.no.length}{" "}
-                      <Outcome outcome={m.outcome} />
+                      <Outcome outcome={m.outcome} /> <ProceduralTag kind={m.procedural} />
                     </span>
                   </span>
                 </li>

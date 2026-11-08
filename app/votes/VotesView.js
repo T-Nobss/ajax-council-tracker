@@ -20,7 +20,7 @@ const RESULTS = [
 ];
 
 // Filter defaults. Anything else is written to the address bar.
-const DEFAULTS = { tab: "recorded", year: "all", month: "all", type: "all", result: "all", member: "", q: "", split: "1" };
+const DEFAULTS = { tab: "recorded", year: "all", month: "all", type: "all", result: "all", member: "", q: "", split: "1", proc: "1" };
 
 function formatDate(iso) {
   const [y, m, d] = iso.split("-").map(Number);
@@ -39,6 +39,52 @@ export function Outcome({ outcome }) {
   return <span className={`outcome outcome-${outcome.kind}`}>{outcome.label}</span>;
 }
 
+const PROC_LABEL = {
+  adjournment: "Adjournment",
+  "closed session": "Closed session",
+  "confirming by-law": "Confirming by-law",
+  agenda: "Agenda",
+};
+export function ProceduralTag({ kind }) {
+  return kind ? (
+    <span className="proc-tag" title="A routine procedural motion">
+      Procedural · {PROC_LABEL[kind] ?? kind}
+    </span>
+  ) : null;
+}
+
+// For / Against, then who was absent or didn't vote.
+export function Tally({ yes, no, absent = [], notVoting = [] }) {
+  return (
+    <div className="tally">
+      <span className="tally-score">
+        {yes.length}–{no.length}
+      </span>
+      <span className="tally-side tally-yes">
+        <strong>For:</strong> {yes.join(", ") || "none"}
+      </span>
+      <span className="tally-side tally-no">
+        <strong>Against:</strong> {no.join(", ") || "none"}
+      </span>
+      {(absent.length > 0 || notVoting.length > 0) && (
+        <span className="tally-side tally-out">
+          {absent.length > 0 && (
+            <>
+              <strong>Absent:</strong> {absent.join(", ")}
+            </>
+          )}
+          {absent.length > 0 && notVoting.length > 0 && " · "}
+          {notVoting.length > 0 && (
+            <>
+              <strong>Didn&rsquo;t vote:</strong> {notVoting.join(", ")}
+            </>
+          )}
+        </span>
+      )}
+    </div>
+  );
+}
+
 function VoteCard({ m, member }) {
   const theirVote = member ? (m.yesIds.includes(member) ? "For" : m.noIds.includes(member) ? "Against" : null) : null;
   return (
@@ -50,18 +96,9 @@ function VoteCard({ m, member }) {
         <Outcome outcome={m.outcome} />
       </div>
       <p className="vote-item">{m.item}</p>
+      <ProceduralTag kind={m.procedural} />
       <p className="vote-text">{m.text}</p>
-      <div className="tally">
-        <span className="tally-score">
-          {m.yes.length}–{m.no.length}
-        </span>
-        <span className="tally-side tally-yes">
-          <strong>For:</strong> {m.yes.join(", ") || "none"}
-        </span>
-        <span className="tally-side tally-no">
-          <strong>Against:</strong> {m.no.join(", ") || "none"}
-        </span>
-      </div>
+      <Tally yes={m.yes} no={m.no} absent={m.absent} notVoting={m.notVoting} />
       {theirVote && (
         <p className={`their-vote mv-${theirVote.toLowerCase()}`}>Voted {theirVote.toLowerCase()}</p>
       )}
@@ -119,7 +156,8 @@ export default function VotesView({ terms, recorded, meetings, members }) {
     });
     setShown(PAGE);
   }
-  const clearAll = () => set({ ...DEFAULTS, tab: f.tab, term: terms[0]?.id ?? "all", split: f.tab === "recorded" ? "0" : "1" });
+  const clearAll = () =>
+    set({ ...DEFAULTS, tab: f.tab, term: terms[0]?.id ?? "all", split: f.tab === "recorded" ? "0" : "1", proc: f.tab === "recorded" ? "0" : "1" });
 
   // Date options depend on what's in the selected term.
   const inTerm = (x) => f.term === "all" || x.term === f.term;
@@ -150,6 +188,7 @@ export default function VotesView({ terms, recorded, meetings, members }) {
           typeMatches(m.type, f.type) &&
           (f.result === "all" || m.outcome.kind === f.result) &&
           (f.split !== "1" || m.split) &&
+          (f.proc !== "1" || !m.procedural) &&
           (!f.member || m.yesIds.includes(f.member) || m.noIds.includes(f.member)) &&
           (!query || `${m.item} ${m.text} ${m.yes.join(" ")} ${m.no.join(" ")}`.toLowerCase().includes(query))
       ),
@@ -165,11 +204,12 @@ export default function VotesView({ terms, recorded, meetings, members }) {
     f.type !== "all" && ["type", TYPES.find(([v]) => v === f.type)?.[1]],
     f.tab === "recorded" && f.result !== "all" && ["result", RESULTS.find(([v]) => v === f.result)?.[1]],
     f.tab === "recorded" && f.split === "1" && ["split", "Split votes only"],
+    f.tab === "recorded" && f.proc === "1" && ["proc", "Procedural votes hidden"],
     f.tab === "recorded" && f.member && ["member", memberName],
     f.tab === "recorded" && query && ["q", `“${f.q.trim()}”`],
   ].filter(Boolean);
   const removeChip = (key) =>
-    set(key === "year" ? { year: "all" } : key === "split" ? { split: "0" } : { [key]: DEFAULTS[key] });
+    set(key === "year" ? { year: "all" } : key === "split" ? { split: "0" } : key === "proc" ? { proc: "0" } : { [key]: DEFAULTS[key] });
 
   // Group by month for display.
   function groups(rows) {
@@ -270,6 +310,10 @@ export default function VotesView({ terms, recorded, meetings, members }) {
               <input type="checkbox" checked={f.split === "1"} onChange={(e) => set({ split: e.target.checked ? "1" : "0" })} />
               Split votes only
             </label>
+            <label className="check">
+              <input type="checkbox" checked={f.proc === "1"} onChange={(e) => set({ proc: e.target.checked ? "1" : "0" })} />
+              Hide procedural votes
+            </label>
           </div>
         )}
         {chips.length > 0 && (
@@ -300,7 +344,14 @@ export default function VotesView({ terms, recorded, meetings, members }) {
               </p>
               <p>
                 <strong>Split votes</strong> are the ones where members disagreed.
-                Untick the box to include unanimous recorded votes too. Pick a{" "}
+                Untick the box to include unanimous recorded votes too.{" "}
+                <strong>Procedural votes</strong> (adjourning a meeting, going
+                into closed session, passing the confirming by-law) are hidden by
+                default; untick &ldquo;Hide procedural votes&rdquo; to show them.
+                Under each vote, <strong>Absent</strong> means the member wasn&rsquo;t
+                at the meeting (from the minutes&rsquo; attendance list) and{" "}
+                <strong>Didn&rsquo;t vote</strong> means they were there but
+                aren&rsquo;t listed as voting, for example because they had left. Pick a{" "}
                 <strong>member</strong> to see only votes they took part in, with
                 how they voted.
               </p>

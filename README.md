@@ -29,8 +29,9 @@ or any text editor.
 | `councillors.csv` | a person who has served on council | `id`, `name` |
 | `seats.csv` | a person's seat during one term | `councillor_id`, `term_id`, `role`, `ward` |
 | `meetings.csv` | a council meeting | `id`, `term_id`, `date`, `type`, `minutes_url` |
-| `motions.csv` | a motion voted on at a meeting | `id`, `meeting_id`, `item`, `text`, `mover`, `seconder`, `result`, `recorded_vote` |
+| `motions.csv` | a motion voted on at a meeting | `id`, `meeting_id`, `item`, `text`, `mover`, `seconder`, `result`, `recorded_vote`, `procedural` |
 | `votes.csv` | one councillor's vote on one motion | `motion_id`, `councillor_id`, `vote` |
+| `attendance.csv` | one member's attendance at one meeting (from the minutes' "Present" / "Regrets" list) | `meeting_id`, `councillor_id`, `status` (present / regrets / absent), `note` (e.g. "exited at 3:05 p.m.") |
 | `expenses.csv` | one expense total for a councillor | `councillor_id`, `year`, `category`, `amount`, `source_url` |
 | `salaries.csv` | one year of Town of Ajax pay for a member of council | `councillor_id`, `year`, `salary`, `taxable_benefits`, `source_url` |
 | `budget.csv` | one department's operating budget for one year | `year`, `department`, `gross_expenditure`, `revenue`, `net_budget`, `source_url`, `page` |
@@ -271,6 +272,25 @@ it can be added to the header in `app/layout.js`.
   to be removed, delete the rows (the site falls back to initials). Members
   without a photo show their initials. To add one, save the image to
   `public/councillors/<id>.jpg` and add a row to the CSV.
+
+---
+
+## How motions and votes are read
+
+`scripts/extract_motions.py` reads every minutes file in `sources/minutes/`
+(scanned ones via the OCR text in `sources/minutes-text/`) and writes
+`motions.csv`, `votes.csv` and `attendance.csv`. Check
+`data/review/votes.md` after each run; it has a coverage table by year.
+
+- **procedural** marks routine motions: adjournment, going into closed
+  session, and the confirming by-law. Ajax's minutes have no separate
+  "approve the agenda" motion. The Votes page hides these by default.
+- **[sic]**: where the Town's own minutes contradict the agenda item (e.g. a
+  2026 report called "March 9, 2025"), the text is kept exactly as written
+  and the wrong date is followed by [sic]. These are listed in the review file.
+- **Absent / Didn't vote** on recorded votes come from the attendance list.
+  Anyone with a recorded vote counts as present even if a typo in the list
+  left them out (listed in the review file).
 
 ---
 

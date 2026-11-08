@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMeetings, getVotingRecord, surname } from "@/lib/data";
-import { Outcome } from "../VotesView";
+import { Outcome, ProceduralTag, Tally } from "../VotesView";
 
 export const dynamicParams = false;
 
@@ -62,23 +62,19 @@ export default async function MeetingPage({ params }) {
                 <span className="motion-item">{m.item || "Motion"}</span>
                 <Outcome outcome={m.outcome} />
               </div>
+              <ProceduralTag kind={m.procedural} />
               <p className="vote-text">{m.text}</p>
               <p className="motion-movers">
                 Moved by {person(m.mover, m.mover)}
                 {m.seconder && <> · Seconded by {person(m.seconder, m.seconder)}</>}
               </p>
               {(m.yes.length > 0 || m.no.length > 0) && (
-                <div className="tally">
-                  <span className="tally-score">
-                    {m.yes.length}–{m.no.length}
-                  </span>
-                  <span className="tally-side tally-yes">
-                    <strong>For:</strong> {m.yes.map(short).join(", ") || "none"}
-                  </span>
-                  <span className="tally-side tally-no">
-                    <strong>Against:</strong> {m.no.map(short).join(", ") || "none"}
-                  </span>
-                </div>
+                <Tally
+                  yes={m.yes.map(short)}
+                  no={m.no.map(short)}
+                  absent={m.absent.map((x) => short(x.id) + (x.note ? ` (${x.note})` : ""))}
+                  notVoting={m.notVoting.map((x) => short(x.id) + (x.note ? ` (${x.note})` : ""))}
+                />
               )}
             </li>
           ))}
