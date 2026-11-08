@@ -1,5 +1,6 @@
 // Context for comparing wards across the 2018 change from four wards to three.
-export const WARD_CHANGE_SOURCE = "https://globalnews.ca/news/4540132/ajax-municipal-election-2018/";
+export const WARD_CHANGE_SOURCE =
+  "https://www.durhamregion.com/news/ajax-moving-to-three-ward-system/article_0cc1f72b-cecf-538d-9a6f-014df0b98287.html";
 
 export default function WardChangeNote() {
   return (
