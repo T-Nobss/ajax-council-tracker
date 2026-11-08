@@ -147,6 +147,49 @@ File: `Form-4-Financial-Statement-Lisa-Bower.pdf` (8 pages). Table 3 lists 8 don
 - No auditor's report (under $10,000).
 - Names as written: "James Van Dusen" (Bower), "James Vandusen" (Tyler Morin), "Jim Vandusen" (Crawford), "Jim VanDusen" (Lee).
 
-## Not yet done
+## 2022 – Shaun Collier (Mayor) – elected
 
-- Shaun Collier and Ashmeed Khan (2022) – PDFs are in `sources/campaigns/2022/`.
+File: `Form-4-Financial-Statement-Shaun-Collier-March-27-2023.pdf` (14 pages).
+Table 3 says "Per Attached Worksheet" ($89,500.00). The worksheet ("Donations Exceeding $100 – Campaign to Re-Elect Shaun Collier Mayor of Ajax 2022") is on pp. 8–12, printed sideways.
+
+- Worksheet: 99 entries, total **$89,500.00 = line 1B**. Its column totals also match: cheques $36,850 + e-transfer $2,400 + credit card $50,250 = $89,500. No handwritten changes.
+- Same issue as Lee and Tyler Morin: **four donations of exactly $100** inside line 1B (Ron, Brad, James and Rob Schlegel). Not listed, so the rows add up to **$89,100.00** ($400 less). Explained in `donations_note`.
+- **Daniel Drimmer** appears twice (two $500 credit-card entries, same date). Combined into one $1,000 row, since the rule is about each donor's total. Marked in the `flag` column.
+- Joint entries kept as one row each, as written: "Ed and Jill Boddy", "Thilo and Ute Sack", "Michael/Brenda McLean".
+- Line 1A check: $1,617.70 (candidate, goods: 52 arterial + 188 small signs from 2018) + $50.00 + $89,500.00 = $91,167.70. ✓ Money from candidate is blank.
+- Expenses check: C2 $77,918.23 + C3 $3,320.05 + C4 $7,678.00 = C5 $88,916.28; **surplus $2,251.42**. ✓
+- The "additional information on separate attachment" box under Table 1 (candidate's goods/services) is ticked, but Table 1 is empty and there's no attachment for it. The goods are listed in Table 2 (inventory).
+- Auditor: Gordon Peters, CPA, Turner Moore LLP, Ajax, 2023/03/01 (pp. 13–14; qualified opinion – not summarized).
+
+### Flags
+
+| Donor | Written town | Issue |
+|---|---|---|
+| Harold Green | Ajax | Postal code is a Pickering (L1V) code. (On Rob Tyler Morin's list his postal code is an Ajax one.) |
+
+Spelled as written: "Stoufville", "Noth York", "JuneSoetens", "Helain Paula Silver". "Willowdale", "Unionville", "Streetsville" and "Scarborough" are kept as the communities written.
+
+## 2022 – Ashmeed Khan (Councillor, Ward 2) – **unsuccessful**
+
+File: `Form-4-Financial-Statement-Ashmeed-Khan.pdf` (10 pages).
+
+- Marked `result = unsuccessful` (shown as "Not elected"). He held the Ward 2 Local Councillor seat in 2018–2022.
+- Office written as "City Councillor"; ward handwritten as "ward 2". Recorded as "City Councillor", "Ward 2".
+- Donor rows (Table 3, pp. 5–6) add up to **$22,050.00 = line 1B**. ✓
+- Line 1A check: $400.00 + $22,050.00 = $22,450.00. ✓ Nothing from the candidate.
+- Expenses check: C2 $21,625.17 + C4 $1,949.62 = C5 $23,574.79; deficit −$1,124.79. ✓ C3 is blank.
+- The parties spending limit in Box A is blank.
+- Campaign period on the form: 2022/05/04 to **2023/01/03**.
+- Auditor: Igor Kostioutchenko, CPA, Mortimer Kostioutchenko Patel CPAs LLP, Ottawa, report dated March 30, 2023 (pp. 9–10; qualified opinion – not summarized). The auditor's page on the form has no date and "Report is attached" isn't ticked, but the report is attached. The report gives the period as "May 4, 2023 to January 3, 2023" (the start year looks like a typo for 2022).
+
+### Flags
+
+| Donor | Written town | Issue |
+|---|---|---|
+| Maxsim Tarski | Ajax | Postal code is a Pickering (L1V) code. (Same street address on Collier's list, as "(Max) Maksim Tarsky", has an Ajax L1T code.) |
+
+Spelled as written: "Maxsim Tarski", "Kenneth B Ronvinelli", "R Micheal Mclean", "Ashfaq Alam Kahn".
+
+## All 2022 filings done
+
+Collier, Crawford, Lee, Tyler Morin, Henry, Dies, Bower and Khan.

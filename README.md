@@ -277,7 +277,8 @@ $21,750, which is $600 less than line 1B ($22,350). The campaign put six donatio
 $100 on line 1B. They aren't over $100, so they aren't listed by name. They
 are still counted in the form's totals. Decided: keep the rule (don't list
 them) and explain the difference with a note. The same applies to Rob Tyler
-Morin's 2022 filing (one $100 donation, so the rows are $100 less than line 1B).
+Morin's 2022 filing (one $100 donation, so the rows are $100 less than line 1B)
+and Shaun Collier's (four $100 donations, $400 less).
 
 ---
 

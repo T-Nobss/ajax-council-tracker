@@ -84,7 +84,7 @@ export default function CampaignSection({ name, campaigns }) {
                       <td className="num">{money(c.total_expenses)}</td>
                     </tr>
                     <tr className="ey-sum">
-                      <th scope="row">{Number(c.surplus_deficit) < 0 ? "Deficit" : "Surplus or deficit"}</th>
+                      <th scope="row">{Number(c.surplus_deficit) < 0 ? "Deficit" : Number(c.surplus_deficit) > 0 ? "Surplus" : "Surplus or deficit"}</th>
                       <td className="num">
                         {money(c.surplus_deficit === "" ? "" : Math.abs(Number(c.surplus_deficit)))}
                       </td>
