@@ -39,8 +39,9 @@ or any text editor.
 | `budget_reconciliation.csv` | why one year's department totals differ from the budget book's town-wide page (shown as a note on the Spending page) | `year`, `departments_spending`, `departments_revenue`, `town_spending`, `town_revenue`, `library_revenue`, `library_debt`, `other_costs`, `other_recoveries`, `town_page`, `library_page`, `source_url` |
 | `actuals.csv` | one line of the Town's audited results for one year (revenue by source, spending by service area) | `year`, `section`, `category`, `budget`, `actual`, `source_url`, `page` |
 | `documents.csv` | one budget or financial report document (shown on the Spending page's Documents tab) | `year`, `group`, `title`, `url` |
-| `campaigns.csv` | one candidate's election campaign finances, copied from their Form 4 filing | `id` (e.g. `2022-sterling-lee`), `councillor_id`, `election_year`, `office`, `ward`, `result` (elected / unsuccessful), the Form 4 totals, `donations_note` (shown behind an "i" next to the donor list), `source_url` |
+| `campaigns.csv` | one candidate's election campaign finances, copied from their Form 4 filing | `id` (e.g. `2022-sterling-lee`), `councillor_id`, `election_year`, `office`, `ward`, `result` (elected / unsuccessful), the Form 4 totals (a blank line on the form stays blank and shows as a dash), `donations_note` (shown behind an "i" next to the donor list), `source_url` |
 | `donations.csv` | one donor who gave a campaign **more than $100** | `campaign_id`, `donor_name`, `municipality` (as written; never the address), `amount`, `flag` (for review only, not shown), `source_page` |
+| `campaign_documents.csv` | a document about a campaign, such as a Compliance Audit Committee decision (linked under that campaign) | `campaign_id`, `title` (official title only), `description` (optional, one line), `url`, `source_file` |
 | `budget_adoption.csv` | who adopted each year's budget, and when | `year`, `adopted_by`, `date`, `source` |
 
 `salaries.csv` is filled in automatically by a script (see
@@ -275,7 +276,8 @@ Rules:
 $21,750, which is $600 less than line 1B ($22,350). The campaign put six donations of exactly
 $100 on line 1B. They aren't over $100, so they aren't listed by name. They
 are still counted in the form's totals. Decided: keep the rule (don't list
-them) and explain the difference with a note.
+them) and explain the difference with a note. The same applies to Rob Tyler
+Morin's 2022 filing (one $100 donation, so the rows are $100 less than line 1B).
 
 ---
 

@@ -1,8 +1,15 @@
 import InfoHeading from "../../components/InfoHeading";
 import ShowMore from "../../components/ShowMore";
 
+// Blank on the form -> a dash.
 const money = (v) =>
-  Number(v).toLocaleString("en-CA", { style: "currency", currency: "CAD" });
+  v === "" || v == null
+    ? "—"
+    : Number(v).toLocaleString("en-CA", { style: "currency", currency: "CAD" });
+const fromCandidate = (c) =>
+  c.candidate_money === "" && c.candidate_goods === ""
+    ? ""
+    : (Number(c.candidate_money) || 0) + (Number(c.candidate_goods) || 0);
 
 const RESULT = { elected: "Elected", unsuccessful: "Not elected" };
 
@@ -31,6 +38,7 @@ export default function CampaignSection({ name, campaigns }) {
             &ldquo;From the candidate&rdquo; includes money or goods the
             candidate (or their spouse) put into their own campaign.
           </li>
+          <li>A dash (&mdash;) means that line was left blank on the form.</li>
         </ul>
         <p>Tap a year to see the details and the original filing.</p>
       </InfoHeading>
@@ -53,7 +61,7 @@ export default function CampaignSection({ name, campaigns }) {
                   <tbody>
                     <tr>
                       <th scope="row">From the candidate or spouse</th>
-                      <td className="num">{money(c.contributions_from_candidate_spouse)}</td>
+                      <td className="num">{money(fromCandidate(c))}</td>
                     </tr>
                     <tr>
                       <th scope="row">Donations of $100 or less (combined)</th>
@@ -76,8 +84,10 @@ export default function CampaignSection({ name, campaigns }) {
                       <td className="num">{money(c.total_expenses)}</td>
                     </tr>
                     <tr className="ey-sum">
-                      <th scope="row">{Number(c.surplus_deficit) < 0 ? "Deficit" : "Surplus"}</th>
-                      <td className="num">{money(Math.abs(Number(c.surplus_deficit)))}</td>
+                      <th scope="row">{Number(c.surplus_deficit) < 0 ? "Deficit" : "Surplus or deficit"}</th>
+                      <td className="num">
+                        {money(c.surplus_deficit === "" ? "" : Math.abs(Number(c.surplus_deficit)))}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -108,6 +118,15 @@ export default function CampaignSection({ name, campaigns }) {
                     </ShowMore>
                   </>
                 )}
+
+                {c.documents.map((d) => (
+                  <p key={d.url} className="ey-source">
+                    <a href={d.url} target="_blank" rel="noopener noreferrer">
+                      {d.title}
+                    </a>
+                    {d.description && <> &mdash; {d.description}</>}
+                  </p>
+                ))}
 
                 <p className="ey-source">
                   Source:{" "}

@@ -218,9 +218,9 @@ export default async function CouncillorPage({ params }) {
 
       <ExpensesSection name={c.name} years={expenseYears} />
 
-      <CampaignSection name={c.name} campaigns={getCampaigns(c.id)} />
-
       <VotesSection id={c.id} name={c.name} />
+
+      <CampaignSection name={c.name} campaigns={getCampaigns(c.id)} />
     </>
   );
 }
