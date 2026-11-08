@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import AvatarView from "../components/AvatarView";
+import WardChangeNote from "../components/WardChangeNote";
 
 const ALL = "all";
 
@@ -77,6 +78,8 @@ export default function CouncillorList({ terms, councillors }) {
           </select>
         </div>
       )}
+
+      {(term === ALL || term === "2014-2018") && <WardChangeNote />}
 
       {sorted.length === 0 ? (
         <div className="notice">No councillors have been added yet.</div>

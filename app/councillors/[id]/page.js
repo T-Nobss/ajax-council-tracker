@@ -11,6 +11,7 @@ import {
 } from "@/lib/data";
 import ExpensesSection from "./ExpensesSection";
 import VotesSection from "./VotesSection";
+import { WARD_CHANGE_SOURCE } from "../../components/WardChangeNote";
 import Avatar from "../../components/Avatar";
 import SalarySection from "./SalarySection";
 
@@ -101,6 +102,15 @@ export default async function CouncillorPage({ params }) {
               {s.term && (
                 <span className="dates">
                   {formatDate(s.term.start_date)} – {formatDate(s.term.end_date)}
+                </span>
+              )}
+              {s.term_id === "2014-2018" && (
+                <span className="seat-note">
+                  Before the 2018 ward change, Ajax had four wards, so this
+                  ward isn&rsquo;t the same area as today&rsquo;s.{" "}
+                  <a href={WARD_CHANGE_SOURCE} target="_blank" rel="noopener noreferrer">
+                    Source
+                  </a>
                 </span>
               )}
             </li>

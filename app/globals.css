@@ -1406,3 +1406,19 @@ h2 {
 .show-less {
   color: var(--muted);
 }
+
+/* Context notes */
+.context-note {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--gold);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+.seats .seat-note {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  font-style: italic;
+}
