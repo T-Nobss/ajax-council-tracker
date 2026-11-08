@@ -24,6 +24,8 @@ export default function VotesPage() {
       split: m.split,
       yes: m.yes.map(short),
       no: m.no.map(short),
+      yesIds: m.yes,
+      noIds: m.no,
     }))
     .sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));
 
@@ -43,13 +45,19 @@ export default function VotesPage() {
   const termIds = new Set(meetingList.map((m) => m.term));
   const terms = getTermsSorted().filter((t) => termIds.has(t.id)).map((t) => ({ id: t.id, name: t.name }));
 
+  // Members who appear in at least one recorded vote, for the member filter.
+  const voters = new Set(recorded.flatMap((m) => [...m.yesIds, ...m.noIds]));
+  const members = [...voters]
+    .map((id) => ({ id, name: people.get(id)?.name ?? id }))
+    .sort((a, b) => surname(a.name).localeCompare(surname(b.name)));
+
   return (
     <>
       <PageHero
         title="Votes"
         lead="Every motion at Council and General Government Committee, and how each member voted when names were recorded."
       />
-      <VotesView terms={terms} recorded={recorded} meetings={meetingList} />
+      <VotesView terms={terms} recorded={recorded} meetings={meetingList} members={members} />
     </>
   );
 }

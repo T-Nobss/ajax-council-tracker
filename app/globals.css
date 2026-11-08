@@ -1422,3 +1422,141 @@ h2 {
   font-size: 0.82rem;
   font-style: italic;
 }
+
+/* Votes filters */
+.filter-panel {
+  margin: 14px 0 6px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.f-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+}
+@media (min-width: 640px) {
+  .f-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.f-field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.f-field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.f-field select {
+  font: inherit;
+  font-size: 16px;
+  width: 100%;
+  min-width: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+.f-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin-top: 12px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+.chip {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border: 1px solid var(--navy-2);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--heading);
+  cursor: pointer;
+}
+.chip:hover {
+  background: var(--navy-2);
+  color: #fff;
+}
+.chip-clear,
+.link-btn {
+  font: inherit;
+  font-size: 0.85rem;
+  background: none;
+  border: 0;
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+.month-group + .month-group {
+  margin-top: 6px;
+}
+.month-heading {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 14px 0 8px;
+  padding: 6px 0;
+  font-size: 0.95rem;
+  background: var(--bg);
+  border-bottom: 2px solid var(--gold);
+}
+.their-vote {
+  display: inline-block;
+  margin: 10px 0 0;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.f-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  font: inherit;
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--heading);
+  background: none;
+  border: 0;
+  padding: 0 0 10px;
+  cursor: pointer;
+}
+.f-toggle-meta {
+  font-family: system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--accent);
+}
+.filter-panel .f-grid[hidden] + .f-row {
+  margin-top: 0;
+}
+.f-grid[hidden] {
+  display: none;
+}
+.f-field select:disabled {
+  opacity: 0.55;
+}
+@media (min-width: 640px) {
+  .f-toggle {
+    display: none;
+  }
+}
