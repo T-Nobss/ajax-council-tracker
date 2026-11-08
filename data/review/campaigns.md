@@ -78,5 +78,4 @@ Options: (a) keep as is (rule 3) and explain the $600 gap on the site; or
 
 - Campaign result: elected (Regional Councillor, Ward 2, 2022).
 - Deficit of $77.38 (line D1/D2) recorded as `-77.38`.
-- The auditor's opinion is qualified (the standard limitation for campaign
-  contributions that can't be fully verified); no summary is given on the site.
+- The auditor's opinion is qualified (pp. 19, 21). Not summarized here.
